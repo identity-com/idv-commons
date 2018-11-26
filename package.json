@@ -1,0 +1,95 @@
+{
+  "name": "@identity.com/idv-commons",
+  "version": "0.1.0",
+  "author": "Identity.com Community",
+  "license": "MIT",
+  "description": "Credential Request and Interactive Validation",
+  "keywords": [
+    "credentials",
+    "anchor",
+    "attestation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/identity-com/idv-commons.git"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
+  "browser": "dist/browser/index.js",
+  "scripts": {
+    "lint": "eslint ./src/**.js ./test/**.js --max-warnings=0",
+    "test": "cross-env NODE_ENV=false jest test/unit",
+    "test:watch": "jest --watch",
+    "build:cjs": "BABEL_ENV=cjs babel src -d build/cjs",
+    "build:es": "babel src -d build/es --no-babelrc",
+    "build:browser:before": "BABEL_ENV=browser babel src -d build/prebrowser",
+    "build:browser:after": "minify build/prebrowser -d build/browser",
+    "build:browser:clean": "rimraf build/prebrowser",
+    "build:browser": "npm run build:browser:before && npm run build:browser:after && npm run build:browser:clean",
+    "build": "npm run build:browser && npm run build:cjs && npm run build:es",
+    "build:clean": "rimraf build/",
+    "dist": "npm run dist:clean && npm run build && cp -R build/* dist/",
+    "dist:clean": "rimraf dist/*",
+    "clean": "npm run build:clean && npm run dist:clean",
+    "postversion": "git add --all && git commit -m\"build and version $npm_package_version\" -m\"[skip ci]\" && git push",
+    "pretag": "git fetch --tags",
+    "tag": "git tag v$npm_package_version && git push origin --tags",
+    "precommit": "npm run lint"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.24.1",
+    "babel-jest": "^23.4.0",
+    "babel-minify": "^0.4.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-no-only-tests": "^2.0.0",
+    "eslint-plugin-react": "^7.10.0",
+    "husky": "^1.1.2",
+    "jest": "^23.4.1",
+    "jest-html-reporter": "^2.3.0",
+    "request-debug": "^0.2.0",
+    "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "@identity.com/credential-commons": "^0.2.26",
+    "lodash": "^4.17.11",
+    "uuid": "^3.3.2"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/build/"
+    ],
+    "collectCoverageFrom": [
+      "**/src/**/*.{js}",
+      "!**/node_modules/**",
+      "!**/build/**",
+      "!**/vendor/**",
+      "!src/services/DummyAnchorServiceImpl.js",
+      "!src/services/anchorService.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 85,
+        "functions": 85,
+        "lines": 85,
+        "statements": 85
+      }
+    },
+    "coverageDirectory": "reports/coverage",
+    "collectCoverage": true,
+    "testResultsProcessor": "./node_modules/jest-html-reporter",
+    "verbose": true
+  },
+  "jest-html-reporter": {
+    "pageTitle": "Credential Request and Interactive Validation Framework Test Suite",
+    "outputPath": "reports/test-report.html",
+    "includeFailureMsg": true
+  }
+}
