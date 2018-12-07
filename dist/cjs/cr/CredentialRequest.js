@@ -73,20 +73,22 @@ class CredentialRequest {
     // }
   }
 
-  createAndSignCredential() {
+  createCredential() {
+    const ucaInstances = _.map(this.acceptedUcas, uca => new UCA(uca.identifier, uca.value));
+    const credential = new VC(this.credentialIdentifier, this.idv, null, ucaInstances, 1);
+    this.credentialId = credential.id;
+    return credential;
+  }
+
+  anchorCredential(credentialObj, options) {
     var _this = this;
 
     return _asyncToGenerator(function* () {
       try {
-        // UCAs had been validated before on acceptUCAs, to do that again
-        const ucaInstances = _.map(_this.acceptedUcas, function (uca) {
-          return new UCA(uca.identifier, uca.value);
-        });
-        const credential = new VC(_this.credentialIdentifier, _this.idv, null, ucaInstances, 1);
-        const signedCredential = yield credential.requestAnchor();
-        _this.credentialId = signedCredential.id;
+        const credential = VC.fromJSON(credentialObj);
+        const anchoredCredential = yield credential.requestAnchor(options);
         _this.status = CR_STATUSES.ISSUED;
-        return signedCredential;
+        return anchoredCredential;
       } catch (err) {
         throw err;
       }

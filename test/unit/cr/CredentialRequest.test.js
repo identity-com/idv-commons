@@ -150,7 +150,7 @@ describe('CredentialRequest', () => {
     }
   });
 
-  it('createAndSignCredential - success', async (done) => {
+  it('createCredential - success', async (done) => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
@@ -167,14 +167,12 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptUcas(ucasForCredential);
-    // console.log(JSON.stringify(crTest, null, 2));
     expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
-    // save
 
-    const credential = await crTest.createAndSignCredential();
-    // save
-    expect(crTest.status).toEqual(CR_STATUSES.ISSUED);
-    console.log(JSON.stringify(credential, null, 2));
+    const credential = crTest.createCredential();
+
+    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+
     expect(credential).toBeDefined();
     expect(credential.id).toEqual(crTest.credentialId);
     expect(credential.issuer).toEqual(crTest.idv);
@@ -186,52 +184,8 @@ describe('CredentialRequest', () => {
     done();
   });
 
-  it('createAndSignCredential - fromJSON - success', async (done) => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
-      {
-        identifier: 'cvc:Type:country',
-        value: 'BR',
-      },
-      {
-        identifier: 'cvc:Phone:countryCode',
-        value: '55',
-      },
-      {
-        identifier: 'cvc:Phone:number',
-        value: '31983904114',
-      },
-      {
-        identifier: 'cvc:Phone:lineType',
-        value: 'mobile',
-      },
-    ];
-
-    crTest.acceptUcas(ucasForCredential);
-    // console.log(JSON.stringify(crTest, null, 2));
-    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
-    // save and retrive
-    const crTestFromJSON = CredentialRequest.fromJSON(JSON.parse(JSON.stringify(crTest)));
-
-    const credential = await crTestFromJSON.createAndSignCredential();
-    // save
-    expect(crTestFromJSON.status).toEqual(CR_STATUSES.ISSUED);
-    // console.log(JSON.stringify(credential, null, 2));
-    expect(credential).toBeDefined();
-    expect(credential.id).toEqual(crTestFromJSON.credentialId);
-    expect(credential.issuer).toEqual(crTestFromJSON.idv);
-    expect(credential.identifier).toEqual(crTestFromJSON.credentialIdentifier);
-    expect(credential.claim).toBeDefined();
-    expect(credential.proof).toBeDefined();
-    expect(credential.proof.type).toEqual('CvcMerkleProof2018');
-    expect(credential.proof.merkleRoot).toBeDefined();
-    done();
-  });
-
-
-  it('createAndSignCredential - with error', async (done) => {
+  it('anchorCredential - success', async (done) => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
@@ -248,12 +202,46 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptUcas(ucasForCredential);
-    // console.log(JSON.stringify(crTest, null, 2));
+    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
 
-    // force error
+    const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
+    const credential = await crTest.anchorCredential(credentialObj);
+
+    expect(crTest.status).toEqual(CR_STATUSES.ISSUED);
+    expect(credential).toBeDefined();
+    expect(credential.id).toEqual(crTest.credentialId);
+    expect(credential.issuer).toEqual(crTest.idv);
+    expect(credential.identifier).toEqual(crTest.credentialIdentifier);
+    expect(credential.claim).toBeDefined();
+    expect(credential.proof).toBeDefined();
+    expect(credential.proof.type).toEqual('CvcMerkleProof2018');
+    expect(credential.proof.merkleRoot).toBeDefined();
+    done();
+  });
+
+
+  it('anchorCredential - error', async (done) => {
+    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+
+    const ucasForCredential = [
+      {
+        identifier: 'cvc:Contact:phoneNumber',
+        value: {
+          country: 'BR',
+          countryCode: '55',
+          number: '31988889999',
+          lineType: 'mobile',
+        },
+      },
+    ];
+
+    crTest.acceptUcas(ucasForCredential);
     crTest.acceptedUcas = null;
+    const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
+
     try {
-      const credential = await crTest.createAndSignCredential();
+      const credential = await crTest.anchorCredential(credentialObj);
       expect(credential).not.toBeDefined();
     } catch (err) {
       expect(err).toBeDefined();

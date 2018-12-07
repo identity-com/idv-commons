@@ -70,15 +70,19 @@ class CredentialRequest {
     // }
   }
 
-  async createAndSignCredential() {
+  createCredential() {
+    const ucaInstances = _.map(this.acceptedUcas, uca => (new UCA(uca.identifier, uca.value)));
+    const credential = new VC(this.credentialIdentifier, this.idv, null, ucaInstances, 1);
+    this.credentialId = credential.id;
+    return credential;
+  }
+
+  async anchorCredential(credentialObj, options) {
     try {
-      // UCAs had been validated before on acceptUCAs, to do that again
-      const ucaInstances = _.map(this.acceptedUcas, uca => (new UCA(uca.identifier, uca.value)));
-      const credential = new VC(this.credentialIdentifier, this.idv, null, ucaInstances, 1);
-      const signedCredential = await credential.requestAnchor();
-      this.credentialId = signedCredential.id;
+      const credential = VC.fromJSON(credentialObj);
+      const anchoredCredential = await credential.requestAnchor(options);
       this.status = CR_STATUSES.ISSUED;
-      return signedCredential;
+      return anchoredCredential;
     } catch (err) {
       throw err;
     }
