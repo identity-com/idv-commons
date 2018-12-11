@@ -58,7 +58,7 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^0.2.26",
+    "@identity.com/credential-commons": "0.2.32",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2"
   },
