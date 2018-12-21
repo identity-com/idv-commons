@@ -44,7 +44,7 @@ describe('CredentialRequest', () => {
     expect(crTest.createdOn).toBeDefined();
     expect(crTest.updatedOn).toBeDefined();
     expect(crTest.type).toEqual(options.serverConfig.credentialRequestType);
-    expect(crTest.acceptedUcas).toBeNull();
+    expect(crTest.acceptedClaims).toBeNull();
     expect(crTest.credentialId).toBeNull();
   });
 
@@ -65,15 +65,15 @@ describe('CredentialRequest', () => {
     expect(crTest.createdOn).toEqual(crTestFromJSON.createdOn);
     expect(crTest.updatedOn).toEqual(crTestFromJSON.updatedOn);
     expect(crTest.type).toEqual(crTestFromJSON.type);
-    expect(crTest.acceptedUcas).toEqual(crTestFromJSON.acceptedUcas);
+    expect(crTest.acceptedClaims).toEqual(crTestFromJSON.acceptedClaims);
     expect(crTest.credentialId).toEqual(crTestFromJSON.credentialId);
   });
 
-  it('acceptUcas - success', () => {
+  it('acceptClaims - success', () => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
+    const claimsForCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -86,10 +86,10 @@ describe('CredentialRequest', () => {
     ];
 
     try {
-      crTest.acceptUcas(ucasForCredential);
+      crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(crTest, null, 2));
       expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
-      expect(crTest.acceptedUcas).toBeDefined();
+      expect(crTest.acceptedClaims).toBeDefined();
       expect(crTest.credentialId).toBeNull();
     } catch (err) {
       // console.log(err);
@@ -97,11 +97,11 @@ describe('CredentialRequest', () => {
     }
   });
 
-  it('acceptUcas - failure on ucas', () => {
+  it('acceptClaims - failure on claims', () => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
+    const claimsForCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -115,7 +115,7 @@ describe('CredentialRequest', () => {
     ];
 
     try {
-      crTest.acceptUcas(ucasForCredential);
+      crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(cr1, null, 2));
       expect(crTest.status).toEqual(CR_STATUSES.PENDING);
       expect(crTest.credentialId).toBeNull();
@@ -124,12 +124,12 @@ describe('CredentialRequest', () => {
     }
   });
 
-  // SKIP because nowadays VC dosent support UCA validation
-  it.skip('acceptUcas - failure with wrong UCA for VC', async (done) => {
+  // SKIP because nowadays VC dosent support Claim validation
+  it.skip('acceptClaims - failure with wrong Claim for VC', async (done) => {
     const credentialIdentifier = 'cvc:Credential:Email';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredentialOtherCredential = [
+    const claimsForCredentialOtherCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -142,7 +142,7 @@ describe('CredentialRequest', () => {
     ];
 
     try {
-      crTest.acceptUcas(ucasForCredentialOtherCredential);
+      crTest.acceptClaims(claimsForCredentialOtherCredential);
     } catch (err) {
       console.log(err);
       expect(err).toBeDefined();
@@ -154,7 +154,7 @@ describe('CredentialRequest', () => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
+    const claimsForCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -166,7 +166,7 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    crTest.acceptUcas(ucasForCredential);
+    crTest.acceptClaims(claimsForCredential);
     expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
 
     const credential = crTest.createCredential();
@@ -189,7 +189,7 @@ describe('CredentialRequest', () => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
+    const claimsForCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -201,7 +201,7 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    crTest.acceptUcas(ucasForCredential);
+    crTest.acceptClaims(claimsForCredential);
     expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
 
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
@@ -224,7 +224,7 @@ describe('CredentialRequest', () => {
     const credentialIdentifier = 'cvc:Credential:PhoneNumber';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
-    const ucasForCredential = [
+    const claimsForCredential = [
       {
         identifier: 'cvc:Contact:phoneNumber',
         value: {
@@ -236,8 +236,8 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    crTest.acceptUcas(ucasForCredential);
-    crTest.acceptedUcas = null;
+    crTest.acceptClaims(claimsForCredential);
+    crTest.acceptedClaims = null;
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
 
     try {

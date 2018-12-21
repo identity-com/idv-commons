@@ -1,7 +1,7 @@
 
 const uuidv4 = require('uuid/v4');
 const _ = require('lodash');
-const { VC, UCA } = require('@identity.com/credential-commons');
+const { VC, Claim } = require('@identity.com/credential-commons');
 
 const CR_TYPES = {
   INTERACTIVE: 'interactive',
@@ -25,7 +25,7 @@ class CredentialRequest {
     this.createdOn = (jsonObj && jsonObj.createdOn) || (new Date()).getTime();
     this.updatedOn = (jsonObj && jsonObj.updatedOn) || this.createdOn;
     this.type = (jsonObj && jsonObj.type) || (config && config.credentialRequestType);
-    this.acceptedUcas = (jsonObj && jsonObj.acceptedUcas) || null;
+    this.acceptedClaims = (jsonObj && jsonObj.acceptedClaims) || null;
     this.credentialId = (jsonObj && jsonObj.credentialId) || null;
   }
 
@@ -34,35 +34,35 @@ class CredentialRequest {
     return newCR;
   }
 
-  acceptUcas(ucas) {
-    const ucaInstances = _.map(ucas, (uca) => {
-      let ucaInstance;
+  acceptClaims(claims) {
+    const claimInstances = _.map(claims, (claim) => {
+      let claimInstance;
       try {
-        ucaInstance = new UCA(uca.identifier, uca.value); // eslint-disable-line
-        ucaInstance.checkStatus = 'valid';
+        claimInstance = new Claim(claim.identifier, claim.value); // eslint-disable-line
+        claimInstance.checkStatus = 'valid';
       } catch (err) {
-        ucaInstance = {
+        claimInstance = {
           checkStatus: 'invalid',
           checkErrorMsg: err.stack,
-          uca,
+          claim: claim,
         };
       }
-      return ucaInstance;
+      return claimInstance;
     });
-    const c = _.find(ucaInstances, { checkStatus: 'invalid' });
+    const c = _.find(claimInstances, { checkStatus: 'invalid' });
     if (!_.isNil(c)) {
       // console.log(`c=${JSON.stringify(c)}`);
       // TODO better message here:
-      throw Error(`There are invalid UCAs c=${JSON.stringify(c)}`);
+      throw Error(`There are invalid Claims c=${JSON.stringify(c)}`);
     }
 
-    this.acceptedUcas = _.merge({}, ucas);
+    this.acceptedClaims = _.merge({}, claims);
     this.status = CR_STATUSES.ACCEPTED;
-    // TOOD: The bellow test has no effect until VCs has validation against UCAs - currently not supported
-    // // Check if that ucas can creates the requested credentialIndentifier
+    // TOOD: The bellow test has no effect until VCs has validation against Claims - currently not supported
+    // // Check if that claims can creates the requested credentialIndentifier
     // try {
-    //   const check = new VC(this.credentialIdentifier, this.idv, null, ucaInstances, 1); // eslint-disable-line
-    //   this.acceptedUcas = _.merge({}, ucas);
+    //   const check = new VC(this.credentialIdentifier, this.idv, null, claimInstances, 1); // eslint-disable-line
+    //   this.acceptedClaims = _.merge({}, claims);
     //   this.status = CR_STATUSES.ACCEPTED;
     // } catch (err) {
     //   // console.log(err);
@@ -71,8 +71,8 @@ class CredentialRequest {
   }
 
   createCredential() {
-    const ucaInstances = _.map(this.acceptedUcas, uca => (new UCA(uca.identifier, uca.value)));
-    const credential = new VC(this.credentialIdentifier, this.idv, null, ucaInstances, 1);
+    const claimInstances = _.map(this.acceptedClaims, claim => (new Claim(claim.identifier, claim.value)));
+    const credential = new VC(this.credentialIdentifier, this.idv, null, claimInstances, 1);
     this.credentialId = credential.id;
     return credential;
   }
