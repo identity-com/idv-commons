@@ -1,0 +1,1 @@
+"use strict";var CredentialRequest=require("./cr/CredentialRequest"),CredentialRequestManager=require("./cr/CredentialRequestManager");module.exports={CredentialRequestManager:CredentialRequestManager,CredentialRequest:CredentialRequest};
