@@ -1,4 +1,4 @@
-# [WIP] Identity.com Credential Request and Interactive Validation Library
+# [WIP] Identity.com Credential Request and Interactive Validation Library 
 
 - Credential Request Library (CR)
 - Interactive Validation Library (IV)
