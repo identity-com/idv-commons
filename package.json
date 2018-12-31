@@ -17,7 +17,7 @@
   "module": "dist/es/index.js",
   "browser": "dist/browser/index.js",
   "scripts": {
-    "lint": "eslint ./src/**.js ./test/**.js --max-warnings=0",
+    "lint": "eslint ./src ./test --max-warnings=0",
     "test": "cross-env NODE_ENV=false jest test/unit",
     "test:watch": "jest --watch",
     "build:cjs": "BABEL_ENV=cjs babel src -d build/cjs",
