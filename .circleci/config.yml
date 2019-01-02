@@ -13,7 +13,6 @@ workflows:
           filters:
             branches:
               only:
-                - feature/CCS-723_configure_ci_and_repository_permissions # temporarily, shoud be removed before final merge
                 - master
 
 jobs:
