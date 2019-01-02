@@ -144,7 +144,6 @@ describe('CredentialRequest', () => {
     try {
       crTest.acceptClaims(claimsForCredentialOtherCredential);
     } catch (err) {
-      // console.log(err);
       expect(err).toBeDefined();
       done();
     }
