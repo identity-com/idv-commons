@@ -44,7 +44,7 @@ class CredentialRequest {
         claimInstance = {
           checkStatus: 'invalid',
           checkErrorMsg: err.stack,
-          claim: claim
+          claim
         };
       }
       return claimInstance;
