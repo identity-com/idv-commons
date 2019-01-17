@@ -32,13 +32,13 @@ describe('CredentialRequest', () => {
   });
 
   it('createCredentialRequest', () => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
     expect(crTest).toBeDefined();
     // console.log(JSON.stringify(crTest, null, 2));
 
     expect(crTest.id).toBeDefined();
-    expect(crTest.credentialIdentifier).toEqual('cvc:Credential:PhoneNumber');
+    expect(crTest.credentialIdentifier).toEqual('credential-cvc:PhoneNumber-v1');
     expect(crTest.idv).toEqual(options.serverConfig.idvDid);
     expect(crTest.status).toEqual(CR_STATUSES.PENDING);
     expect(crTest.createdOn).toBeDefined();
@@ -49,7 +49,7 @@ describe('CredentialRequest', () => {
   });
 
   it('CR.fromJSON', () => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
     expect(crTest).toBeDefined();
 
@@ -70,7 +70,7 @@ describe('CredentialRequest', () => {
   });
 
   it('acceptClaims - success', () => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
     const claimsForCredential = [
@@ -98,7 +98,7 @@ describe('CredentialRequest', () => {
   });
 
   it('acceptClaims - failure on claims', () => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
     const claimsForCredential = [
@@ -150,7 +150,7 @@ describe('CredentialRequest', () => {
   });
 
   it('createCredential - success', async (done) => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
     const claimsForCredential = [
@@ -185,7 +185,7 @@ describe('CredentialRequest', () => {
 
 
   it('anchorCredential - success', async (done) => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
     const claimsForCredential = [
@@ -220,7 +220,7 @@ describe('CredentialRequest', () => {
 
 
   it('anchorCredential - error', async (done) => {
-    const credentialIdentifier = 'cvc:Credential:PhoneNumber';
+    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialIdentifier);
 
     const claimsForCredential = [
