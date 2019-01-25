@@ -22,8 +22,6 @@ class CredentialRequest {
     this.credentialIdentifier = (jsonObj && jsonObj.credentialIdentifier) || credentialIdentifier;
     this.idv = (jsonObj && jsonObj.idv) || (config && config.idvDid);
     this.status = (jsonObj && jsonObj.status) || CredentialRequestStatus.PENDING;
-    this.createdOn = (jsonObj && jsonObj.createdOn) || (new Date()).getTime();
-    this.updatedOn = (jsonObj && jsonObj.updatedOn) || this.createdOn;
     this.type = (jsonObj && jsonObj.type) || (config && config.credentialRequestType);
     this.acceptedClaims = (jsonObj && jsonObj.acceptedClaims) || null;
     this.credentialId = (jsonObj && jsonObj.credentialId) || null;

@@ -41,8 +41,6 @@ describe('CredentialRequest', () => {
     expect(crTest.credentialIdentifier).toEqual('credential-cvc:PhoneNumber-v1');
     expect(crTest.idv).toEqual(options.serverConfig.idvDid);
     expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
-    expect(crTest.createdOn).toBeDefined();
-    expect(crTest.updatedOn).toBeDefined();
     expect(crTest.type).toEqual(options.serverConfig.credentialRequestType);
     expect(crTest.acceptedClaims).toBeNull();
     expect(crTest.credentialId).toBeNull();
@@ -62,8 +60,6 @@ describe('CredentialRequest', () => {
     expect(crTest.credentialIdentifier).toEqual(crTestFromJSON.credentialIdentifier);
     expect(crTest.idv).toEqual(crTestFromJSON.idv);
     expect(crTest.status).toEqual(crTestFromJSON.status);
-    expect(crTest.createdOn).toEqual(crTestFromJSON.createdOn);
-    expect(crTest.updatedOn).toEqual(crTestFromJSON.updatedOn);
     expect(crTest.type).toEqual(crTestFromJSON.type);
     expect(crTest.acceptedClaims).toEqual(crTestFromJSON.acceptedClaims);
     expect(crTest.credentialId).toEqual(crTestFromJSON.credentialId);
