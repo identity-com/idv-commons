@@ -28,7 +28,7 @@ class CredentialRequest {
   }
 
   static fromJSON(obj) {
-    const newCR = new CredentialRequest(null, null, _.merge(obj, {}));
+    const newCR = new CredentialRequest(null, null, _.merge({}, obj));
     return newCR;
   }
 
