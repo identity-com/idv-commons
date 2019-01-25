@@ -3,12 +3,12 @@ const uuidv4 = require('uuid/v4');
 const _ = require('lodash');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
-const CR_TYPES = {
+const CredentialRequestType = {
   INTERACTIVE: 'interactive',
   DIRECT: 'direct',
 };
 
-const CR_STATUSES = {
+const CredentialRequestStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
   ISSUED: 'issued',
@@ -21,7 +21,7 @@ class CredentialRequest {
     this.id = (jsonObj && jsonObj.id) || uuidv4();
     this.credentialIdentifier = (jsonObj && jsonObj.credentialIdentifier) || credentialIdentifier;
     this.idv = (jsonObj && jsonObj.idv) || (config && config.idvDid);
-    this.status = (jsonObj && jsonObj.status) || CR_STATUSES.PENDING;
+    this.status = (jsonObj && jsonObj.status) || CredentialRequestStatus.PENDING;
     this.createdOn = (jsonObj && jsonObj.createdOn) || (new Date()).getTime();
     this.updatedOn = (jsonObj && jsonObj.updatedOn) || this.createdOn;
     this.type = (jsonObj && jsonObj.type) || (config && config.credentialRequestType);
@@ -57,7 +57,7 @@ class CredentialRequest {
     }
 
     this.acceptedClaims = _.merge({}, claims);
-    this.status = CR_STATUSES.ACCEPTED;
+    this.status = CredentialRequestStatus.ACCEPTED;
     // TOOD: The bellow test has no effect until VCs has validation against Claims - currently not supported
     // // Check if that claims can creates the requested credentialIndentifier
     // try {
@@ -81,7 +81,7 @@ class CredentialRequest {
     try {
       const credential = VC.fromJSON(credentialObj);
       const anchoredCredential = await credential.requestAnchor(options);
-      this.status = CR_STATUSES.ISSUED;
+      this.status = CredentialRequestStatus.ISSUED;
       return anchoredCredential;
     } catch (err) {
       throw err;
@@ -89,4 +89,4 @@ class CredentialRequest {
   }
 }
 
-module.exports = { CredentialRequest, CR_STATUSES, CR_TYPES };
+module.exports = { CredentialRequest, CredentialRequestStatus, CredentialRequestType };

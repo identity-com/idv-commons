@@ -1,11 +1,11 @@
 const CredentialRequestManager = require('../../../src/cr/CredentialRequestManager');
-const { CredentialRequest, CR_TYPES, CR_STATUSES } = require('../../../src/cr/CredentialRequest');
+const { CredentialRequest, CredentialRequestType, CredentialRequestStatus } = require('../../../src/cr/CredentialRequest');
 
 const options = {
   mode: 'server', // 'client'
   serverConfig: {
     idvDid: 'did:ethr:000000',
-    credentialRequestType: CR_TYPES.INTERACTIVE,
+    credentialRequestType: CredentialRequestType.INTERACTIVE,
     anchorService: { // For the CredentialCommons AnchorService
       // pluginImpl: genericAnchorPlugin,
       pluginConfig: {
@@ -40,7 +40,7 @@ describe('CredentialRequest', () => {
     expect(crTest.id).toBeDefined();
     expect(crTest.credentialIdentifier).toEqual('credential-cvc:PhoneNumber-v1');
     expect(crTest.idv).toEqual(options.serverConfig.idvDid);
-    expect(crTest.status).toEqual(CR_STATUSES.PENDING);
+    expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
     expect(crTest.createdOn).toBeDefined();
     expect(crTest.updatedOn).toBeDefined();
     expect(crTest.type).toEqual(options.serverConfig.credentialRequestType);
@@ -88,7 +88,7 @@ describe('CredentialRequest', () => {
     try {
       crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(crTest, null, 2));
-      expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+      expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
       expect(crTest.acceptedClaims).toBeDefined();
       expect(crTest.credentialId).toBeNull();
     } catch (err) {
@@ -117,7 +117,7 @@ describe('CredentialRequest', () => {
     try {
       crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(cr1, null, 2));
-      expect(crTest.status).toEqual(CR_STATUSES.PENDING);
+      expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
       expect(crTest.credentialId).toBeNull();
     } catch (err) {
       expect(err).toBeDefined();
@@ -166,11 +166,11 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptClaims(claimsForCredential);
-    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
 
     const credential = crTest.createCredential();
 
-    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
 
     expect(credential).toBeDefined();
     expect(credential.id).toEqual(crTest.credentialId);
@@ -201,12 +201,12 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptClaims(claimsForCredential);
-    expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
 
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
     const credential = await crTest.anchorCredential(credentialObj);
 
-    expect(crTest.status).toEqual(CR_STATUSES.ISSUED);
+    expect(crTest.status).toEqual(CredentialRequestStatus.ISSUED);
     expect(credential).toBeDefined();
     expect(credential.id).toEqual(crTest.credentialId);
     expect(credential.issuer).toEqual(crTest.idv);
@@ -244,7 +244,7 @@ describe('CredentialRequest', () => {
       expect(credential).not.toBeDefined();
     } catch (err) {
       expect(err).toBeDefined();
-      expect(crTest.status).toEqual(CR_STATUSES.ACCEPTED);
+      expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
       done();
     }
   });
