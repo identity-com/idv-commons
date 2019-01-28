@@ -29,8 +29,6 @@ describe('ValidationProcess', () => {
   it('Should parse a valid Validation Process', () => {
     const parsedVP = new ValidationProcess(validationProcessInitialState);
     expect(parsedVP).to.be.an.instanceof(ValidationProcess);
-    // console.log(JSON.stringify(parsedVP, null, 2));
-
     expect(parsedVP.id).to.be.a('string');
     expect(parsedVP.credentialItem).to.be.a('string');
     expect(parsedVP.processUrl).to.be.a('string');
@@ -53,21 +51,19 @@ describe('ValidationProcess', () => {
     const parsedVP = new ValidationProcess(validationProcessInitialState);
     expect(parsedVP).to.be.an.instanceof(ValidationProcess);
 
-    expect(parsedVP.getValidationUcas()).to.be.a('array').that.is.not.empty;
+    expect(parsedVP.getValidationUcas()).to.be.a('array');
+    expect(parsedVP.getValidationUcas().length).to.be.above(0);
     parsedVP.getValidationUcas().forEach((vUca) => {
       expect(vUca.ucaMapId).to.be.a('string');
       expect(vUca.ucaName).to.be.a('string');
       expect(vUca.ucaVersion).to.be.a('string');
       expect(vUca.url).to.be.a('string');
-    })
-    // console.log(JSON.stringify(parsedVP.getValidationUcas(), null, 2));
+    });
   });
 
   it('getValidationUcasByStatus should return the correct number of UCAs', () => {
     const parsedVP = new ValidationProcess(validationProcessOneAwaitingUserInputTwoAccepted);
     expect(parsedVP).to.be.an.instanceof(ValidationProcess);
-    // console.log(JSON.stringify(parsedVP, null, 2));
-
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.ACCEPTED).length).to.equal(2);
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.AWAITING_USER_INPUT).length).to.equal(1);
   });
@@ -77,21 +73,17 @@ describe('ValidationUCA', () => {
   it('Should parse a valid ValidationUCA', () => {
     const parsedValidationUCA = new ValidationUCA('test', validUCAObj);
     expect(parsedValidationUCA).to.be.an.instanceof(ValidationUCA);
-    // console.log(JSON.stringify(parsedValidationUCA, null, 2));
-
     expect(parsedValidationUCA.ucaMapId).to.be.a('string');
     expect(parsedValidationUCA.ucaName).to.be.a('string');
     expect(parsedValidationUCA.status).to.be.a('string');
     expect(parsedValidationUCA.dependsOn).to.be.a('array');
-    expect(parsedValidationUCA.dependsOnStatus).to.be.undefined;
+    expect(parsedValidationUCA.dependsOnStatus).to.equal(undefined);
     expect(parsedValidationUCA.ucaVersion).to.equal('1');
   });
 
   it('Should parse a valid ValidationUCA with a dependsOnStatus', () => {
     const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '2', 'VALIDATING');
     expect(parsedValidationUCA).to.be.an.instanceof(ValidationUCA);
-    // console.log(JSON.stringify(parsedValidationUCA, null, 2));
-
     expect(parsedValidationUCA.ucaMapId).to.be.a('string');
     expect(parsedValidationUCA.ucaName).to.be.a('string');
     expect(parsedValidationUCA.status).to.be.a('string');
@@ -134,13 +126,11 @@ describe('ValidationUCA', () => {
           status: 'AWAITING_USER_INPUT',
         }, '1', 'VALIDATING'),
       ];
-      // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
       expect(parsedValidationUCA.dependsOnArray).to.deep.equal(expDependsOnArray);
     });
     it('should return an empty dependsOnArray array with no dependsOn', () => {
       const parsedValidationUCA = new ValidationUCA('phoneNumberToken', noDependsUCA, '1');
-      // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
-      expect(parsedValidationUCA.dependsOnArray).to.be.a('array').that.is.empty;
+      expect(parsedValidationUCA.dependsOnArray).to.deep.equal([]);
     });
   });
   describe('ValidationUCAValue', () => {
