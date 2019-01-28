@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
-const { ValidationProcessStatus } = require('../constants/validationConstants');
 
 const validIdentifiers = definitions.map(d => d.identifier);
 
@@ -57,11 +56,10 @@ class ValidationUCAValue {
 }
 
 class ValidationUCA {
-  
-  constructor(ucaMapId, ucaObj, ucaVersion = '1', dependsOnStatus) {
+  constructor(ucaMapId, ucaObj, ucaVersion = defaultUcaVersion, dependsOnStatus) {
     const getOrThrow = (obj, key) => {
       const retVal = _.get(obj, key);
-      if(retVal) return retVal;
+      if (retVal) return retVal;
       throw new BadValidationUCAError(`${key} not present in ${obj}`);
     };
     // the ucaMapId is the string reference used in the process to refer to this UCA
@@ -87,20 +85,19 @@ class ValidationUCA {
   get dependsOnArray() {
     if (!this.dependsOnValidationUcas && this.dependsOn && this.dependsOn.length > 0) {
       // eslint-disable-next-line no-unused-vars, no-undef
-      this.dependsOnValidationUcas = _.map(this.dependsOn, (dependsOnObj) => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
+      this.dependsOnValidationUcas = _.map(this.dependsOn, dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
     }
     return this.dependsOnValidationUcas;
   }
 }
 
 class ValidationProcess {
-  
   constructor(processObj) {
     const getOrThrow = (obj, key) => {
       const retVal = _.get(obj, key);
-      if(retVal) return retVal;
+      if (retVal) return retVal;
       throw new BadValidationProcessError(`${key} not present in ${obj}`);
-    }
+    };
     this.id = getOrThrow(processObj, 'id');
     this.credentialItem = getOrThrow(processObj, 'state.credential');
     this.processUrl = getOrThrow(processObj, 'processUrl');
@@ -118,7 +115,6 @@ class ValidationProcess {
   }
 
   getValidationUcasByStatus(status) {
-    console.log(`getValidationUcasByStatus(${status})`);
     return _.filter(this.getValidationUcas(), vUca => (vUca.status === status));
   }
 }

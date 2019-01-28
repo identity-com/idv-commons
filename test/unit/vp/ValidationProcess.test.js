@@ -1,18 +1,20 @@
 
 const _ = require('lodash');
-const { 
-  validationProcessInitialState, 
+const {
+  validationProcessInitialState,
   validationProcessOneAwaitingUserInputTwoAccepted,
   validUCAObj,
   noStatusUCAObj,
   noNameUCAObj,
   nameUcaVal,
-  phoneNumberToken } = require('../../fixtures/validationProcess');
-const { 
-  ValidationProcess, 
-  BadValidationProcessError, 
+  phoneNumberToken,
+} = require('../../fixtures/validationProcess');
+const {
+  ValidationProcess,
+  BadValidationProcessError,
   ValidationUCA,
-  BadValidationUCAError } = require('../../../src/vp/ValidationProcess');
+  BadValidationUCAError,
+} = require('../../../src/vp/ValidationProcess');
 const { UCAStatus } = require('../../../src/constants/validationConstants');
 
 describe('ValidationProcess', () => {
@@ -27,7 +29,7 @@ describe('ValidationProcess', () => {
     */
     const parsedVP = new ValidationProcess(validationProcessInitialState);
     expect(parsedVP).toBeDefined();
-    console.log(JSON.stringify(parsedVP, null, 2));
+    // console.log(JSON.stringify(parsedVP, null, 2));
 
     expect(parsedVP.id).toBeDefined();
     expect(parsedVP.credentialItem).toBeDefined();
@@ -39,8 +41,8 @@ describe('ValidationProcess', () => {
 
   it('throws an error with an invalid Validation Process', () => {
     const necessaryProperties = ['id', 'state.credential', 'processUrl', 'state.status', 'state.ucaVersion', 'state.ucas'];
-    necessaryProperties.forEach(element => {
-      let invalidationProcessInitialState = _.merge({}, validationProcessInitialState);
+    necessaryProperties.forEach((element) => {
+      const invalidationProcessInitialState = _.merge({}, validationProcessInitialState);
       _.unset(invalidationProcessInitialState, element);
       const expextToFail = () => new ValidationProcess(invalidationProcessInitialState);
       expect(expextToFail).toThrowError(BadValidationProcessError);
@@ -52,20 +54,20 @@ describe('ValidationProcess', () => {
     expect(parsedVP).toBeDefined();
 
     expect(parsedVP.getValidationUcas()).toBeDefined();
-    console.log(JSON.stringify(parsedVP.getValidationUcas(), null, 2));
+    // console.log(JSON.stringify(parsedVP.getValidationUcas(), null, 2));
   });
 
   it('getValidationUcasByStatus returns the correct number of UCAs', () => {
     const parsedVP = new ValidationProcess(validationProcessOneAwaitingUserInputTwoAccepted);
     expect(parsedVP).toBeDefined();
-    console.log(JSON.stringify(parsedVP, null, 2));
+    // console.log(JSON.stringify(parsedVP, null, 2));
 
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.ACCEPTED).length).toEqual(2);
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.AWAITING_USER_INPUT).length).toEqual(1);
   });
 });
 
-describe.only('ValidationUCA', () => {
+describe('ValidationUCA', () => {
   it('parses a valid ValidationUCA', () => {
     /*
     this.ucaMapId = ucaMapId;
@@ -76,7 +78,7 @@ describe.only('ValidationUCA', () => {
     */
     const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '1');
     expect(parsedValidationUCA).toBeDefined();
-    console.log(JSON.stringify(parsedValidationUCA, null, 2));
+    // console.log(JSON.stringify(parsedValidationUCA, null, 2));
 
     expect(parsedValidationUCA.ucaMapId).toBeDefined();
     expect(parsedValidationUCA.ucaName).toBeDefined();
@@ -87,12 +89,12 @@ describe.only('ValidationUCA', () => {
 
   it('throws an error with no status in ValidationUCA', () => {
     const expextToFail = () => new ValidationUCA('test', noStatusUCAObj, '1');
-      expect(expextToFail).toThrowError(BadValidationUCAError);
+    expect(expextToFail).toThrowError(BadValidationUCAError);
   });
 
   it('throws an error with no name in ValidationUCA', () => {
     const expextToFail = () => new ValidationUCA('test', noNameUCAObj, '1');
-      expect(expextToFail).toThrowError(BadValidationUCAError);
+    expect(expextToFail).toThrowError(BadValidationUCAError);
   });
 
   describe('with a valid ValidationUC', () => {
@@ -111,12 +113,16 @@ describe.only('ValidationUCA', () => {
     it('returns a valid dependsOn array', () => {
       const parsedValidationUCA = new ValidationUCA('phoneNumberToken', phoneNumberToken, '1');
       const expDependsOnArray = [
-        new ValidationUCA(null, { "name": "cvc:PhoneNumber:countryCode",
-          "status": "AWAITING_USER_INPUT"}, '1', "VALIDATING"),
-          new ValidationUCA(null, { "name": "cvc:PhoneNumber:number",
-          "status": "AWAITING_USER_INPUT"}, '1', "VALIDATING"),
+        new ValidationUCA(null, {
+          name: 'cvc:PhoneNumber:countryCode',
+          status: 'AWAITING_USER_INPUT',
+        }, '1', 'VALIDATING'),
+        new ValidationUCA(null, {
+          name: 'cvc:PhoneNumber:number',
+          status: 'AWAITING_USER_INPUT',
+        }, '1', 'VALIDATING'),
       ];
-      console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
+      // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
       expect(parsedValidationUCA.dependsOnArray).toEqual(expDependsOnArray);
     });
   });
