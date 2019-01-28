@@ -60,7 +60,8 @@
   "dependencies": {
     "@identity.com/credential-commons": "0.3.0",
     "lodash": "^4.17.11",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "@identity.com/uca": "0.0.8"
   },
   "jest": {
     "modulePathIgnorePatterns": [
