@@ -25,7 +25,13 @@ class BadValidationUCAError extends Error {
     this.name = 'BadValidationUCAError';
   }
 }
-
+/* 
+* ValidationUCAValue
+* This class is instantiated by the ValidationUCA in the getValueObj method and allows
+* the value for the UCA to be validated before being sent to the VM.
+* If the value is good, the class is instantiated, and the 'serialize' method returns an object
+* ready for sending to the VM
+*/ 
 class ValidationUCAValue {
   constructor(name, value, ucaVersion) {
     this.name = name;
@@ -55,7 +61,20 @@ class ValidationUCAValue {
     };
   }
 }
-
+/*
+* ValidationUCA
+* this class is used to represent the state of a particular UCA in the validation process
+* it use instantiated by a ValidationProcess on a request to the the array of ValidationUCAs
+* to create a value associated with this UCA, and send it to the VM, the credential wallet 
+* can use the propety 'url' to get the URL to send to, where this must be added to the main processUrl.
+* e.g. /processUrl/${vUca.url}
+* A ValidationUCA can optionally have dependencies which are defined in the 'dependsOn' value passed
+* in from the intiial ucaObj. The 'dependsOnStatus' is optional and refers to the the UCA's status if it
+* is part of a dependency array for another UCA
+* The property 'dependsOnArray' will return an array of instantiated ValidationUCAs, which can be processed in turn
+* The method 'getValueObj(value) can be used to validate the value for this UCA by instantiating the 
+* ValidationUCAValue class. If the value is good, the result is a valid object for sending to the VM
+*/
 class ValidationUCA {
   constructor(ucaMapId, ucaObj, ucaVersion = defaultUcaVersion, dependsOnStatus) {
     const getOrThrow = (obj, key) => {
@@ -74,7 +93,7 @@ class ValidationUCA {
   }
 
   get url() {
-    return `/ucas/${this.ucaMapId}`;
+    return `ucas/${this.ucaMapId}`;
   }
 
   getValueObj(value) {
@@ -93,7 +112,22 @@ class ValidationUCA {
     return this.dependsOnValidationUcas;
   }
 }
-
+/*
+* The ValidationProcess class is used to parse or create a response from the ValidationModule (VM)
+* it contains all the information that the credential wallet should need. The ValidationProcess
+* class should be instantiated with an object that must contain the following items:
+* id: type=string : validation process id. This is created by the VM on a credential request from the Credential Module
+* credentialItem: type=string : the identifier for the credentialItem, e.g. credential-IDaaS-v1
+* processUrl: type=string: the URL that should be used to communicate with the VM with reference to this 
+*             particular process (it already contains the process id)
+* status: type=string: a status defined from the options in ValidationProcessStatus
+* ucaVersion: type=string: the version of all the ucas defined in the uca object
+* ucas: type=Object: an object containing ucaMapId:ucaObject, where the ucaMapId will be used
+*       to send a value for this UCA to the VM
+*
+* helper methods to get an array of ValidationUCAs are provided, and these should be used rather than 
+* delaing with the ucas array directly
+*/
 class ValidationProcess {
   constructor(processObj) {
     const getOrThrow = (obj, key) => {
@@ -111,8 +145,7 @@ class ValidationProcess {
 
   getValidationUcas() {
     if (!this.validationUcas) {
-      // eslint-disable-next-line no-unused-vars, no-undef
-      this.validationUcas = _.map(Object.entries(this.ucas), ([ucaId, ucaObj]) => new ValidationUCA(this.ucaMapId, ucaObj, this.ucaVersion));
+      this.validationUcas = _.map(Object.entries(this.ucas), ([ucaId, ucaObj]) => new ValidationUCA(ucaId, ucaObj, this.ucaVersion));
     }
     return this.validationUcas;
   }

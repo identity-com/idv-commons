@@ -55,7 +55,8 @@
     "jest": "^23.4.1",
     "jest-html-reporter": "^2.3.0",
     "request-debug": "^0.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "chai": "^4.1.2"
   },
   "dependencies": {
     "@identity.com/credential-commons": "0.3.0",
