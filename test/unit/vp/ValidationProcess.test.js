@@ -8,12 +8,16 @@ const {
   noNameUCAObj,
   nameUcaVal,
   phoneNumberToken,
+  goodUcaValue,
+  badUcaValue,
 } = require('../../fixtures/validationProcess');
 const {
   ValidationProcess,
   BadValidationProcessError,
   ValidationUCA,
   BadValidationUCAError,
+  ValidationUCAValue,
+  BadUCAValueError,
 } = require('../../../src/vp/ValidationProcess');
 const { UCAStatus } = require('../../../src/constants/validationConstants');
 
@@ -124,6 +128,17 @@ describe('ValidationUCA', () => {
       ];
       // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
       expect(parsedValidationUCA.dependsOnArray).toEqual(expDependsOnArray);
+    });
+  });
+  describe('ValidationUCAValue', () => {
+    it('is created correctly with a good value', () => {
+      const goodUCA = new ValidationUCAValue('cvc:Identity:name', goodUcaValue, '1');
+      expect(goodUCA.serialize()).toEqual({ value: goodUcaValue });
+    });
+
+    it('throws an error with a bad value', () => {
+      const expextToFail = () => new ValidationUCAValue('cvc:Identity:name', badUcaValue, '1');
+      expect(expextToFail).toThrowError(BadUCAValueError);
     });
   });
 });

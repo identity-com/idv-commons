@@ -115,5 +115,14 @@
         }
       }
     ]
-  }
+  },
+  "goodUcaValue": {
+		"givenNames":"Terence9",			
+		"otherNames":"äüö ßßß",
+		"familyNames":"O'multiple names-with-hyphens"
+  },
+  "badUcaValue": {
+		"otherNames":"äüö ßßß",
+		"familyNames":"O'multiple names-with-hyphens"
+	}
 }
