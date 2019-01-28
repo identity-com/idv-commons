@@ -81,6 +81,10 @@
       }
     }
   },
+  "noDependsUCA": {
+    "name": "cvc:Identity:name",
+    "status": "AWAITING_USER_INPUT"
+  },
   "validUCAObj": {
     "name": "cvc:Identity:name",
     "status": "AWAITING_USER_INPUT"

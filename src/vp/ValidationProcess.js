@@ -29,6 +29,7 @@ class BadValidationUCAError extends Error {
 class ValidationUCAValue {
   constructor(name, value, ucaVersion) {
     this.name = name;
+    if (!this.name) throw new Error('you must provide a name for the UCA');
     this.ucaVersion = ucaVersion;
     this.setValue(value);
   }
@@ -86,6 +87,8 @@ class ValidationUCA {
     if (!this.dependsOnValidationUcas && this.dependsOn && this.dependsOn.length > 0) {
       // eslint-disable-next-line no-unused-vars, no-undef
       this.dependsOnValidationUcas = _.map(this.dependsOn, dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
+    } else {
+      this.dependsOnValidationUcas = [];
     }
     return this.dependsOnValidationUcas;
   }

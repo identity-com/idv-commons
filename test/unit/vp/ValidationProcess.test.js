@@ -10,6 +10,7 @@ const {
   phoneNumberToken,
   goodUcaValue,
   badUcaValue,
+  noDependsUCA,
 } = require('../../fixtures/validationProcess');
 const {
   ValidationProcess,
@@ -77,10 +78,11 @@ describe('ValidationUCA', () => {
     this.ucaMapId = ucaMapId;
     this.ucaName = getOrThrow(ucaObj, 'name');
     this.status = getOrThrow(ucaObj, 'status');
-    this.dependsOn = _.get(ucaObj, 'dependsOn');
     this.ucaVersion = ucaVersion;
+    this.dependsOnStatus = dependsOnStatus;
+    this.dependsOn = _.get(ucaObj, 'dependsOn', []);
     */
-    const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '1');
+    const parsedValidationUCA = new ValidationUCA('test', validUCAObj);
     expect(parsedValidationUCA).toBeDefined();
     // console.log(JSON.stringify(parsedValidationUCA, null, 2));
 
@@ -88,7 +90,29 @@ describe('ValidationUCA', () => {
     expect(parsedValidationUCA.ucaName).toBeDefined();
     expect(parsedValidationUCA.status).toBeDefined();
     expect(parsedValidationUCA.dependsOn).toBeDefined();
-    expect(parsedValidationUCA.ucaVersion).toBeDefined();
+    expect(parsedValidationUCA.dependsOnStatus).toBeUndefined();
+    expect(parsedValidationUCA.ucaVersion).toEqual('1');
+  });
+
+  it('parses a valid ValidationUCA with a dependsOnStatus', () => {
+    /*
+    this.ucaMapId = ucaMapId;
+    this.ucaName = getOrThrow(ucaObj, 'name');
+    this.status = getOrThrow(ucaObj, 'status');
+    this.ucaVersion = ucaVersion;
+    this.dependsOnStatus = dependsOnStatus;
+    this.dependsOn = _.get(ucaObj, 'dependsOn', []);
+    */
+    const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '2', 'VALIDATING');
+    expect(parsedValidationUCA).toBeDefined();
+    // console.log(JSON.stringify(parsedValidationUCA, null, 2));
+
+    expect(parsedValidationUCA.ucaMapId).toBeDefined();
+    expect(parsedValidationUCA.ucaName).toBeDefined();
+    expect(parsedValidationUCA.status).toBeDefined();
+    expect(parsedValidationUCA.dependsOn).toBeDefined();
+    expect(parsedValidationUCA.dependsOnStatus).toEqual('VALIDATING');
+    expect(parsedValidationUCA.ucaVersion).toEqual('2');
   });
 
   it('throws an error with no status in ValidationUCA', () => {
@@ -129,6 +153,12 @@ describe('ValidationUCA', () => {
       // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
       expect(parsedValidationUCA.dependsOnArray).toEqual(expDependsOnArray);
     });
+    it('returns an empty dependsOnArray array with no dependsOn', () => {
+      const parsedValidationUCA = new ValidationUCA('phoneNumberToken', noDependsUCA, '1');
+      const expDependsOnArray = [];
+      // console.log(`parsedValidationUCA.dependsOnArray = ${JSON.stringify(parsedValidationUCA.dependsOnArray)}`);
+      expect(parsedValidationUCA.dependsOnArray).toEqual(expDependsOnArray);
+    });
   });
   describe('ValidationUCAValue', () => {
     it('is created correctly with a good value', () => {
@@ -139,6 +169,16 @@ describe('ValidationUCA', () => {
     it('throws an error with a bad value', () => {
       const expextToFail = () => new ValidationUCAValue('cvc:Identity:name', badUcaValue, '1');
       expect(expextToFail).toThrowError(BadUCAValueError);
+    });
+
+    it('throws an error with no name', () => {
+      const expextToFail = () => new ValidationUCAValue(null, badUcaValue, '1');
+      expect(expextToFail).toThrowError(Error);
+    });
+
+    it('accepts any value for a non-Civic UCA', () => {
+      const goodUCA = new ValidationUCAValue('test_uca', 'test_val', '1');
+      expect(goodUCA.serialize()).toEqual({ value: 'test_val' });
     });
   });
 });
