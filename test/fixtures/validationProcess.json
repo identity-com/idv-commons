@@ -1,0 +1,132 @@
+{
+  "validationProcessInitialState": {
+    "id": "66500737-7e37-472c-a965-0deb91bb006d",
+    "processUrl": "/processes/66500737-7e37-472c-a965-0deb91bb006d",
+    "state": {
+      "status": "IN_PROGRESS",
+      "ucaVersion": "1",
+      "credential": "credential-IDaaS-v1",
+      "ucas": {
+        "name": {
+          "name": "cvc:Identity:name",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "dateOfBirth": {
+          "name": "cvc:Identity:dateOfBirth",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "address": {
+          "name": "cvc:Identity:address",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "email": {
+          "name": "cvc:Contact:email",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "ssn": {
+          "name": "cvc:SocialSecurity:number",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "countryCode": {
+          "name": "cvc:PhoneNumber:countryCode",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "number": {
+          "name": "cvc:PhoneNumber:number",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "phoneNumberToken": {
+          "name": "cvc:Verify:phoneNumberToken",
+          "status": "AWAITING_DEPENDENCY",
+          "dependsOn": [
+            {
+              "status": "VALIDATING",
+              "uca": {
+                "name": "cvc:PhoneNumber:countryCode",
+                "status": "AWAITING_USER_INPUT"
+              }
+            },
+            {
+              "status": "VALIDATING",
+              "uca": {
+                "name": "cvc:PhoneNumber:number",
+                "status": "AWAITING_USER_INPUT"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "validationProcessOneAwaitingUserInputTwoAccepted": {
+    "id": "66500737-7e37-472c-a965-0deb91bb006d",
+    "processUrl": "/processes/66500737-7e37-472c-a965-0deb91bb006d",
+    "state": {
+      "status": "IN_PROGRESS",
+      "ucaVersion": "1",
+      "credential": "credential-IDaaS-v1",
+      "ucas": {
+        "name": {
+          "name": "cvc:Identity:name",
+          "status": "AWAITING_USER_INPUT"
+        },
+        "address": {
+          "name": "cvc:Identity:address",
+          "status": "ACCEPTED"
+        },
+        "email": {
+          "name": "cvc:Contact:email",
+          "status": "ACCEPTED"
+        }
+      }
+    }
+  },
+  "noDependsUCA": {
+    "name": "cvc:Identity:name",
+    "status": "AWAITING_USER_INPUT"
+  },
+  "validUCAObj": {
+    "name": "cvc:Identity:name",
+    "status": "AWAITING_USER_INPUT"
+  },
+  "noStatusUCAObj": {
+    "name": "cvc:Identity:name"
+  },
+  "noNameUCAObj": {
+    "status": "AWAITING_USER_INPUT"
+  },
+  "nameUcaVal": {
+		"givenNames":"Terence9",			
+		"otherNames":"äüö ßßß",
+		"familyNames":"O'multiple names-with-hyphens"
+  },
+  "phoneNumberToken": {
+    "name": "cvc:Verify:phoneNumberToken",
+    "status": "AWAITING_DEPENDENCY",
+    "dependsOn": [
+      {
+        "status": "VALIDATING",
+        "uca": {
+          "name": "cvc:PhoneNumber:countryCode",
+          "status": "AWAITING_USER_INPUT"
+        }
+      },
+      {
+        "status": "VALIDATING",
+        "uca": {
+          "name": "cvc:PhoneNumber:number",
+          "status": "AWAITING_USER_INPUT"
+        }
+      }
+    ]
+  },
+  "goodUcaValue": {
+		"givenNames":"Terence9",			
+		"otherNames":"äüö ßßß",
+		"familyNames":"O'multiple names-with-hyphens"
+  },
+  "badUcaValue": {
+		"otherNames":"äüö ßßß",
+		"familyNames":"O'multiple names-with-hyphens"
+	}
+}

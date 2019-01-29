@@ -3,12 +3,12 @@ const uuidv4 = require('uuid/v4');
 const _ = require('lodash');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
-const CR_TYPES = {
+const CredentialRequestType = {
   INTERACTIVE: 'interactive',
   DIRECT: 'direct',
 };
 
-const CR_STATUSES = {
+const CredentialRequestStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
   ISSUED: 'issued',
@@ -21,16 +21,14 @@ class CredentialRequest {
     this.id = (jsonObj && jsonObj.id) || uuidv4();
     this.credentialIdentifier = (jsonObj && jsonObj.credentialIdentifier) || credentialIdentifier;
     this.idv = (jsonObj && jsonObj.idv) || (config && config.idvDid);
-    this.status = (jsonObj && jsonObj.status) || CR_STATUSES.PENDING;
-    this.createdOn = (jsonObj && jsonObj.createdOn) || (new Date()).getTime();
-    this.updatedOn = (jsonObj && jsonObj.updatedOn) || this.createdOn;
+    this.status = (jsonObj && jsonObj.status) || CredentialRequestStatus.PENDING;
     this.type = (jsonObj && jsonObj.type) || (config && config.credentialRequestType);
     this.acceptedClaims = (jsonObj && jsonObj.acceptedClaims) || null;
     this.credentialId = (jsonObj && jsonObj.credentialId) || null;
   }
 
   static fromJSON(obj) {
-    const newCR = new CredentialRequest(null, null, _.merge(obj, {}));
+    const newCR = new CredentialRequest(null, null, _.merge({}, obj));
     return newCR;
   }
 
@@ -57,17 +55,7 @@ class CredentialRequest {
     }
 
     this.acceptedClaims = _.merge({}, claims);
-    this.status = CR_STATUSES.ACCEPTED;
-    // TOOD: The bellow test has no effect until VCs has validation against Claims - currently not supported
-    // // Check if that claims can creates the requested credentialIndentifier
-    // try {
-    //   const check = new VC(this.credentialIdentifier, this.idv, null, claimInstances, 1); // eslint-disable-line
-    //   this.acceptedClaims = _.merge({}, claims);
-    //   this.status = CR_STATUSES.ACCEPTED;
-    // } catch (err) {
-    //   // console.log(err);
-    //   throw err;
-    // }
+    this.status = CredentialRequestStatus.ACCEPTED;
   }
 
   createCredential() {
@@ -81,7 +69,7 @@ class CredentialRequest {
     try {
       const credential = VC.fromJSON(credentialObj);
       const anchoredCredential = await credential.requestAnchor(options);
-      this.status = CR_STATUSES.ISSUED;
+      this.status = CredentialRequestStatus.ISSUED;
       return anchoredCredential;
     } catch (err) {
       throw err;
@@ -89,4 +77,4 @@ class CredentialRequest {
   }
 }
 
-module.exports = { CredentialRequest, CR_STATUSES, CR_TYPES };
+module.exports = { CredentialRequest, CredentialRequestStatus, CredentialRequestType };

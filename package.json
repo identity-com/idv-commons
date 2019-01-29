@@ -55,12 +55,14 @@
     "jest": "^23.4.1",
     "jest-html-reporter": "^2.3.0",
     "request-debug": "^0.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "chai": "^4.1.2"
   },
   "dependencies": {
     "@identity.com/credential-commons": "0.3.0",
     "lodash": "^4.17.11",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "@identity.com/uca": "0.0.8"
   },
   "jest": {
     "modulePathIgnorePatterns": [
