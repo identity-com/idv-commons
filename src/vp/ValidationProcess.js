@@ -1,30 +1,15 @@
 const _ = require('lodash');
 const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
+const {
+  BadUCAValueError,
+  BadValidationProcessError,
+  BadValidationUCAError,
+} = require('./ValidationErrors');
 
 const validIdentifiers = definitions.map(d => d.identifier);
 
 const defaultUcaVersion = '1';
-class BadUCAValueError extends Error {
-  constructor(ucaId, value, error) {
-    const errMessage = `BadUCAValue: UCA value '${JSON.stringify(value)}' isn't good for UCA Identifier '${ucaId}' UCA error = ${error}`;
-    super(errMessage);
-    this.name = 'BadUCAValue';
-    this.ucaId = ucaId;
-    this.value = value;
-  }
-}
-class BadValidationProcessError extends Error {
-  constructor(error) {
-    super(error);
-    this.name = 'BadValidationProcessError';
-  }
-}
-class BadValidationUCAError extends Error {
-  constructor(error) {
-    super(error);
-    this.name = 'BadValidationUCAError';
-  }
-}
+
 /*
 * ValidationUCAValue
 * This class is instantiated by the ValidationUCA in the getValueObj method and allows

@@ -23,7 +23,7 @@ const {
   ValidationUCAValue,
   BadUCAValueError,
 } = require('../../../src/vp/ValidationProcess');
-const { UCAStatus } = require('../../../src/constants/validationConstants');
+const { UCAStatus } = require('../../../src/constants/ValidationConstants');
 
 describe('ValidationProcess', () => {
   it('Should parse a valid Validation Process', () => {

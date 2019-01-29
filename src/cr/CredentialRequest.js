@@ -56,16 +56,6 @@ class CredentialRequest {
 
     this.acceptedClaims = _.merge({}, claims);
     this.status = CredentialRequestStatus.ACCEPTED;
-    // TOOD: The bellow test has no effect until VCs has validation against Claims - currently not supported
-    // // Check if that claims can creates the requested credentialIndentifier
-    // try {
-    //   const check = new VC(this.credentialIdentifier, this.idv, null, claimInstances, 1); // eslint-disable-line
-    //   this.acceptedClaims = _.merge({}, claims);
-    //   this.status = CR_STATUSES.ACCEPTED;
-    // } catch (err) {
-    //   // console.log(err);
-    //   throw err;
-    // }
   }
 
   createCredential() {
