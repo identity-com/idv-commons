@@ -13,8 +13,8 @@ class CredentialRequestManager {
     }
   }
 
-  createCredentialRequest(credentialIdentifier) {
-    return new CredentialRequest(credentialIdentifier, this.options.serverConfig);
+  createCredentialRequest(credentialItem) {
+    return new CredentialRequest(credentialItem, this.options.serverConfig);
   }
 }
 
