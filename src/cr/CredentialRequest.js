@@ -17,9 +17,9 @@ const CredentialRequestStatus = {
 };
 
 class CredentialRequest {
-  constructor(credentialIdentifier, config, jsonObj) {
+  constructor(credentialItem, config, jsonObj) {
     this.id = (jsonObj && jsonObj.id) || uuidv4();
-    this.credentialIdentifier = (jsonObj && jsonObj.credentialIdentifier) || credentialIdentifier;
+    this.credentialItem = (jsonObj && jsonObj.credentialItem) || credentialItem;
     this.idv = (jsonObj && jsonObj.idv) || (config && config.idvDid);
     this.status = (jsonObj && jsonObj.status) || CredentialRequestStatus.PENDING;
     this.type = (jsonObj && jsonObj.type) || (config && config.credentialRequestType);
@@ -60,7 +60,7 @@ class CredentialRequest {
 
   createCredential() {
     const claimInstances = _.map(this.acceptedClaims, claim => (new Claim(claim.identifier, claim.value)));
-    const credential = new VC(this.credentialIdentifier, this.idv, null, claimInstances, 1);
+    const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1);
     this.credentialId = credential.id;
     return credential;
   }

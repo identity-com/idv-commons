@@ -32,13 +32,13 @@ describe('CredentialRequest', () => {
   });
 
   it('createCredentialRequest', () => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
     expect(crTest).toBeDefined();
     // console.log(JSON.stringify(crTest, null, 2));
 
     expect(crTest.id).toBeDefined();
-    expect(crTest.credentialIdentifier).toEqual('credential-cvc:PhoneNumber-v1');
+    expect(crTest.credentialItem).toEqual('credential-cvc:PhoneNumber-v1');
     expect(crTest.idv).toEqual(options.serverConfig.idvDid);
     expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
     expect(crTest.type).toEqual(options.serverConfig.credentialRequestType);
@@ -47,8 +47,8 @@ describe('CredentialRequest', () => {
   });
 
   it('CR.fromJSON', () => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
     expect(crTest).toBeDefined();
 
     const crTestJSON = JSON.parse(JSON.stringify(crTest));
@@ -57,7 +57,7 @@ describe('CredentialRequest', () => {
     const crTestFromJSON = CredentialRequest.fromJSON(crTestJSON);
 
     expect(crTest.id).toEqual(crTestFromJSON.id);
-    expect(crTest.credentialIdentifier).toEqual(crTestFromJSON.credentialIdentifier);
+    expect(crTest.credentialItem).toEqual(crTestFromJSON.credentialItem);
     expect(crTest.idv).toEqual(crTestFromJSON.idv);
     expect(crTest.status).toEqual(crTestFromJSON.status);
     expect(crTest.type).toEqual(crTestFromJSON.type);
@@ -66,8 +66,8 @@ describe('CredentialRequest', () => {
   });
 
   it('acceptClaims - success', () => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredential = [
       {
@@ -94,8 +94,8 @@ describe('CredentialRequest', () => {
   });
 
   it('acceptClaims - failure on claims', () => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredential = [
       {
@@ -122,8 +122,8 @@ describe('CredentialRequest', () => {
 
   // SKIP because nowadays VC dosent support Claim validation
   it.skip('acceptClaims - failure with wrong Claim for VC', async (done) => {
-    const credentialIdentifier = 'cvc:Credential:Email';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'cvc:Credential:Email';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredentialOtherCredential = [
       {
@@ -146,8 +146,8 @@ describe('CredentialRequest', () => {
   });
 
   it('createCredential - success', async (done) => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredential = [
       {
@@ -171,7 +171,7 @@ describe('CredentialRequest', () => {
     expect(credential).toBeDefined();
     expect(credential.id).toEqual(crTest.credentialId);
     expect(credential.issuer).toEqual(crTest.idv);
-    expect(credential.identifier).toEqual(crTest.credentialIdentifier);
+    expect(credential.identifier).toEqual(crTest.credentialItem);
     expect(credential.claim).toBeDefined();
     expect(credential.proof).toBeDefined();
     expect(credential.proof.type).toEqual('CvcMerkleProof2018');
@@ -181,8 +181,8 @@ describe('CredentialRequest', () => {
 
 
   it('anchorCredential - success', async (done) => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredential = [
       {
@@ -206,7 +206,7 @@ describe('CredentialRequest', () => {
     expect(credential).toBeDefined();
     expect(credential.id).toEqual(crTest.credentialId);
     expect(credential.issuer).toEqual(crTest.idv);
-    expect(credential.identifier).toEqual(crTest.credentialIdentifier);
+    expect(credential.identifier).toEqual(crTest.credentialItem);
     expect(credential.claim).toBeDefined();
     expect(credential.proof).toBeDefined();
     expect(credential.proof.type).toEqual('CvcMerkleProof2018');
@@ -216,8 +216,8 @@ describe('CredentialRequest', () => {
 
 
   it('anchorCredential - error', async (done) => {
-    const credentialIdentifier = 'credential-cvc:PhoneNumber-v1';
-    const crTest = crManager.createCredentialRequest(credentialIdentifier);
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const crTest = crManager.createCredentialRequest(credentialItem);
 
     const claimsForCredential = [
       {
