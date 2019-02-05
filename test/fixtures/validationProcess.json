@@ -5,7 +5,7 @@
     "state": {
       "status": "IN_PROGRESS",
       "ucaVersion": "1",
-      "credential": "credential-IDaaS-v1",
+      "credential": "credential-cvc:IDVaaS-v1",
       "ucas": {
         "name": {
           "name": "cvc:Identity:name",
@@ -64,7 +64,7 @@
     "state": {
       "status": "IN_PROGRESS",
       "ucaVersion": "1",
-      "credential": "credential-IDaaS-v1",
+      "credential": "credential-cvc:IDVaaS-v1",
       "ucas": {
         "name": {
           "name": "cvc:Identity:name",
