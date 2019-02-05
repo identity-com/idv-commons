@@ -34,7 +34,8 @@
     "postversion": "git add --all && git commit -m\"build and version $npm_package_version\" -m\"[skip ci]\" && git push",
     "pretag": "git fetch --tags",
     "tag": "git tag v$npm_package_version && git push origin --tags",
-    "precommit": "npm run lint"
+    "precommit": "npm run lint",
+    "check": "npm run lint && npm run test"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -59,7 +60,7 @@
     "chai": "^4.1.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^0.3.6",
+    "@identity.com/credential-commons": "^1.0.0-rc.0",
     "@identity.com/uca": "0.0.8",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2"
