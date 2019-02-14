@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -60,8 +60,8 @@
     "chai": "^4.1.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^1.0.0-rc.0",
-    "@identity.com/uca": "0.0.8",
+    "@identity.com/credential-commons": "^1.0.0-rc.2",
+    "@identity.com/uca": "^1.0.0-rc.1",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2"
   },
