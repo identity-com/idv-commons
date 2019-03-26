@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Enum for ValidationProcessStatus
+ * @readonly
+ * @enum { string } IN_PROGRESS | COMPLETE | FAILED | CANCELED
+ */
 const ValidationProcessStatus = {
   // The process has been created and has not yet finished
   IN_PROGRESS: 'IN_PROGRESS',
@@ -15,6 +20,11 @@ const ValidationProcessStatus = {
   CANCELED: 'CANCELED'
 };
 
+/**
+ * Enum for UCAStatus
+ * @readonly
+ * @enum { string } AWAITING_USER_INPUT | AWAITING_DEPENDENCY | ACCEPTED | INVALID | VALIDATING | TEMPLATE
+ */
 const UCAStatus = {
   // The UCA is waiting to be collected from the user
   AWAITING_USER_INPUT: 'AWAITING_USER_INPUT',

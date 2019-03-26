@@ -104,7 +104,7 @@ class ValidationUCA {
 * it contains all the information that the credential wallet should need. The ValidationProcess
 * class should be instantiated with an object that must contain the following items:
 * id: type=string : validation process id. This is created by the VM on a credential request from the Credential Module
-* credentialItem: type=string : the identifier for the credentialItem, e.g. credential-IDaaS-v1
+* credentialItem: type=string : the identifier for the credentialItem, e.g. credential-cvc:IDVaaS-v1
 * processUrl: type=string: the URL that should be used to communicate with the VM with reference to this
 *             particular process (it already contains the process id)
 * status: type=string: a status defined from the options in ValidationProcessStatus
