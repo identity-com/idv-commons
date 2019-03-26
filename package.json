@@ -59,10 +59,10 @@
     "chai": "^4.1.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "0.3.0",
+    "@identity.com/credential-commons": "1.0.1",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2",
-    "@identity.com/uca": "0.0.8"
+    "@identity.com/uca": "1.0.1"
   },
   "jest": {
     "modulePathIgnorePatterns": [
