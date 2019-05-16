@@ -44,26 +44,26 @@
     "babel-minify": "^0.4.3",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
+    "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-loader": "^2.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-no-only-tests": "^2.0.0",
-    "eslint-plugin-react": "^7.10.0",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-no-only-tests": "^2.3.0",
+    "eslint-plugin-react": "^7.13.0",
     "husky": "^1.1.2",
     "jest": "^23.4.1",
-    "jest-html-reporter": "^2.3.0",
+    "jest-html-reporter": "^2.5.0",
     "request-debug": "^0.2.0",
-    "rimraf": "^2.6.2",
-    "chai": "^4.1.2"
+    "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.0.9",
+    "@identity.com/credential-commons": "1.0.12",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2",
-    "@identity.com/uca": "1.0.3"
+    "@identity.com/uca": "1.0.6"
   },
   "jest": {
     "modulePathIgnorePatterns": [
