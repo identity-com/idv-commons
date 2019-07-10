@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -60,10 +60,10 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.0.14",
+    "@identity.com/credential-commons": "1.0.20",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2",
-    "@identity.com/uca": "1.0.8"
+    "@identity.com/uca": "1.0.11"
   },
   "jest": {
     "modulePathIgnorePatterns": [
