@@ -61,9 +61,9 @@
   },
   "dependencies": {
     "@identity.com/credential-commons": "1.0.21",
+    "@identity.com/uca": "1.0.12",
     "lodash": "^4.17.11",
-    "uuid": "^3.3.2",
-    "@identity.com/uca": "1.0.11"
+    "uuid": "^3.3.2"
   },
   "jest": {
     "modulePathIgnorePatterns": [
