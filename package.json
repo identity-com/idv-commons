@@ -60,8 +60,8 @@
     "rimraf": "^2.6.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.0.21",
-    "@identity.com/uca": "1.0.12",
+    "@identity.com/credential-commons": "1.0.22",
+    "@identity.com/uca": "1.0.13",
     "lodash": "^4.17.11",
     "uuid": "^3.3.2"
   },
