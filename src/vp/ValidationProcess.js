@@ -6,7 +6,7 @@ const {
   BadValidationUCAError,
 } = require('./ValidationErrors');
 
-const validIdentifiers = definitions.map(d => d.identifier);
+const validIdentifiers = definitions.map((d) => d.identifier);
 
 const defaultUcaVersion = '1';
 
@@ -90,7 +90,7 @@ class ValidationUCA {
   get dependsOnArray() {
     if (!this.dependsOnValidationUcas && this.dependsOn && this.dependsOn.length > 0) {
       // eslint-disable-next-line no-unused-vars, no-undef
-      this.dependsOnValidationUcas = _.map(this.dependsOn, dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
+      this.dependsOnValidationUcas = _.map(this.dependsOn, (dependsOnObj) => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
     } else {
       this.dependsOnValidationUcas = [];
     }
@@ -135,7 +135,7 @@ class ValidationProcess {
   }
 
   getValidationUcasByStatus(status) {
-    return _.filter(this.getValidationUcas(), vUca => (vUca.status === status));
+    return _.filter(this.getValidationUcas(), (vUca) => (vUca.status === status));
   }
 }
 

@@ -1,5 +1,4 @@
-
-const uuidv4 = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const _ = require('lodash');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
@@ -18,7 +17,7 @@ const CredentialRequestStatus = {
 
 class CredentialRequest {
   constructor(credentialItem, config, jsonObj) {
-    this.id = jsonObj && jsonObj.id || uuidv4();
+    this.id = jsonObj && jsonObj.id || uuid();
     this.credentialItem = jsonObj && jsonObj.credentialItem || credentialItem;
     this.idv = jsonObj && jsonObj.idv || config && config.idvDid;
     this.status = jsonObj && jsonObj.status || CredentialRequestStatus.PENDING;
@@ -66,14 +65,10 @@ class CredentialRequest {
   }
 
   async anchorCredential(credentialObj, options) {
-    try {
-      const credential = VC.fromJSON(credentialObj);
-      const anchoredCredential = await credential.requestAnchor(options);
-      this.status = CredentialRequestStatus.ISSUED;
-      return anchoredCredential;
-    } catch (err) {
-      throw err;
-    }
+    const credential = VC.fromJSON(credentialObj);
+    const anchoredCredential = await credential.requestAnchor(options);
+    this.status = CredentialRequestStatus.ISSUED;
+    return anchoredCredential;
   }
 }
 

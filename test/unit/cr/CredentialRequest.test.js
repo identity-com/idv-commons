@@ -179,7 +179,6 @@ describe('CredentialRequest', () => {
     done();
   });
 
-
   it('anchorCredential - success', async (done) => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
@@ -213,7 +212,6 @@ describe('CredentialRequest', () => {
     expect(credential.proof.merkleRoot).toBeDefined();
     done();
   });
-
 
   it('anchorCredential - error', async (done) => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
