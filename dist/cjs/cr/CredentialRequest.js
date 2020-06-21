@@ -2,7 +2,7 @@
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-const uuidv4 = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const _ = require('lodash');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
@@ -21,7 +21,7 @@ const CredentialRequestStatus = {
 
 class CredentialRequest {
   constructor(credentialItem, config, jsonObj) {
-    this.id = jsonObj && jsonObj.id || uuidv4();
+    this.id = jsonObj && jsonObj.id || uuid();
     this.credentialItem = jsonObj && jsonObj.credentialItem || credentialItem;
     this.idv = jsonObj && jsonObj.idv || config && config.idvDid;
     this.status = jsonObj && jsonObj.status || CredentialRequestStatus.PENDING;
@@ -72,14 +72,10 @@ class CredentialRequest {
     var _this = this;
 
     return _asyncToGenerator(function* () {
-      try {
-        const credential = VC.fromJSON(credentialObj);
-        const anchoredCredential = yield credential.requestAnchor(options);
-        _this.status = CredentialRequestStatus.ISSUED;
-        return anchoredCredential;
-      } catch (err) {
-        throw err;
-      }
+      const credential = VC.fromJSON(credentialObj);
+      const anchoredCredential = yield credential.requestAnchor(options);
+      _this.status = CredentialRequestStatus.ISSUED;
+      return anchoredCredential;
     })();
   }
 }
