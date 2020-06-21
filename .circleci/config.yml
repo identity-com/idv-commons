@@ -18,15 +18,11 @@ workflows:
 jobs:
   build:
     docker:
-      - image: circleci/node:8.11
+      - image: circleci/node:12.18
 
     working_directory: ~/repo
 
     steps:
-      #- add_ssh_keys
-      #- run:
-      #    name: Keyscan Github (HACK)
-      #    command: mkdir ~/.ssh/ && ssh-keyscan -H github.com >> ~/.ssh/known_hosts
       - checkout
 
       # Download and cache dependencies
@@ -49,7 +45,7 @@ jobs:
 
   release-tag:
     docker:
-      - image: circleci/node:8.11
+      - image: circleci/node:12.18
 
     working_directory: ~/repo
 
@@ -74,7 +70,7 @@ jobs:
           name: git config
           command: |
             git config credential.helper 'cache --timeout=120'
-            git config user.email "no-reply@civic.com"
+            git config user.email "no-reply@identity.org"
             git config user.name "ci deployer"
             git config --global push.default simple
             git branch --set-upstream-to origin/$CIRCLE_BRANCH
