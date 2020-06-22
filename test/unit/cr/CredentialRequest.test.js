@@ -1,3 +1,5 @@
+const { expect } = require('chai');
+
 const CredentialRequestManager = require('../../../src/cr/CredentialRequestManager');
 const { CredentialRequest, CredentialRequestType, CredentialRequestStatus } = require('../../../src/cr/CredentialRequest');
 
@@ -27,42 +29,41 @@ const options = {
 
 describe('CredentialRequest', () => {
   let crManager;
-  beforeAll(() => {
+  before(() => {
     crManager = new CredentialRequestManager(options);
   });
 
   it('createCredentialRequest', () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
-    expect(crTest).toBeDefined();
-    // console.log(JSON.stringify(crTest, null, 2));
+    expect(crTest).to.exist;
 
-    expect(crTest.id).toBeDefined();
-    expect(crTest.credentialItem).toEqual('credential-cvc:PhoneNumber-v1');
-    expect(crTest.idv).toEqual(options.serverConfig.idvDid);
-    expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
-    expect(crTest.type).toEqual(options.serverConfig.credentialRequestType);
-    expect(crTest.acceptedClaims).toBeNull();
-    expect(crTest.credentialId).toBeNull();
+    expect(crTest.id).to.exist;
+    expect(crTest.credentialItem).to.equal('credential-cvc:PhoneNumber-v1');
+    expect(crTest.idv).to.equal(options.serverConfig.idvDid);
+    expect(crTest.status).to.equal(CredentialRequestStatus.PENDING);
+    expect(crTest.type).to.equal(options.serverConfig.credentialRequestType);
+    expect(crTest.acceptedClaims).to.be.null;
+    expect(crTest.credentialId).to.be.null;
   });
 
   it('CR.fromJSON', () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
-    expect(crTest).toBeDefined();
+    expect(crTest).to.exist;
 
     const crTestJSON = JSON.parse(JSON.stringify(crTest));
     // console.log(JSON.stringify(crTestJSON, null, 2));
 
     const crTestFromJSON = CredentialRequest.fromJSON(crTestJSON);
 
-    expect(crTest.id).toEqual(crTestFromJSON.id);
-    expect(crTest.credentialItem).toEqual(crTestFromJSON.credentialItem);
-    expect(crTest.idv).toEqual(crTestFromJSON.idv);
-    expect(crTest.status).toEqual(crTestFromJSON.status);
-    expect(crTest.type).toEqual(crTestFromJSON.type);
-    expect(crTest.acceptedClaims).toEqual(crTestFromJSON.acceptedClaims);
-    expect(crTest.credentialId).toEqual(crTestFromJSON.credentialId);
+    expect(crTest.id).to.equal(crTestFromJSON.id);
+    expect(crTest.credentialItem).to.equal(crTestFromJSON.credentialItem);
+    expect(crTest.idv).to.equal(crTestFromJSON.idv);
+    expect(crTest.status).to.equal(crTestFromJSON.status);
+    expect(crTest.type).to.equal(crTestFromJSON.type);
+    expect(crTest.acceptedClaims).to.equal(crTestFromJSON.acceptedClaims);
+    expect(crTest.credentialId).to.equal(crTestFromJSON.credentialId);
   });
 
   it('acceptClaims - success', () => {
@@ -84,12 +85,12 @@ describe('CredentialRequest', () => {
     try {
       crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(crTest, null, 2));
-      expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
-      expect(crTest.acceptedClaims).toBeDefined();
-      expect(crTest.credentialId).toBeNull();
+      expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
+      expect(crTest.acceptedClaims).to.exist;
+      expect(crTest.credentialId).to.be.null;
     } catch (err) {
       // console.log(err);
-      expect(err).not.toBeDefined();
+      expect(err).not.to.exist;
     }
   });
 
@@ -113,15 +114,15 @@ describe('CredentialRequest', () => {
     try {
       crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(cr1, null, 2));
-      expect(crTest.status).toEqual(CredentialRequestStatus.PENDING);
-      expect(crTest.credentialId).toBeNull();
+      expect(crTest.status).to.equal(CredentialRequestStatus.PENDING);
+      expect(crTest.credentialId).to.be.null;
     } catch (err) {
-      expect(err).toBeDefined();
+      expect(err).to.exist;
     }
   });
 
-  // SKIP because nowadays VC dosent support Claim validation
-  it.skip('acceptClaims - failure with wrong Claim for VC', async (done) => {
+  // SKIP because, at the moment, VC dosent support Claim validation
+  it.skip('acceptClaims - failure with wrong Claim for VC', async () => {
     const credentialItem = 'cvc:Credential:Email';
     const crTest = crManager.createCredentialRequest(credentialItem);
 
@@ -137,15 +138,12 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    try {
-      crTest.acceptClaims(claimsForCredentialOtherCredential);
-    } catch (err) {
-      expect(err).toBeDefined();
-      done();
-    }
+    const shouldFail = () => crTest.acceptClaims(claimsForCredentialOtherCredential);
+
+    expect(shouldFail).to.throw();
   });
 
-  it('createCredential - success', async (done) => {
+  it('createCredential - success', async () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
 
@@ -162,24 +160,23 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptClaims(claimsForCredential);
-    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
+    expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
     const credential = crTest.createCredential();
 
-    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
+    expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
-    expect(credential).toBeDefined();
-    expect(credential.id).toEqual(crTest.credentialId);
-    expect(credential.issuer).toEqual(crTest.idv);
-    expect(credential.identifier).toEqual(crTest.credentialItem);
-    expect(credential.claim).toBeDefined();
-    expect(credential.proof).toBeDefined();
-    expect(credential.proof.type).toEqual('CvcMerkleProof2018');
-    expect(credential.proof.merkleRoot).toBeDefined();
-    done();
+    expect(credential).to.exist;
+    expect(credential.id).to.equal(crTest.credentialId);
+    expect(credential.issuer).to.equal(crTest.idv);
+    expect(credential.identifier).to.equal(crTest.credentialItem);
+    expect(credential.claim).to.exist;
+    expect(credential.proof).to.exist;
+    expect(credential.proof.type).to.equal('CvcMerkleProof2018');
+    expect(credential.proof.merkleRoot).to.exist;
   });
 
-  it('anchorCredential - success', async (done) => {
+  it('anchorCredential - success', async () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
 
@@ -196,24 +193,23 @@ describe('CredentialRequest', () => {
     ];
 
     crTest.acceptClaims(claimsForCredential);
-    expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
+    expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
     const credential = await crTest.anchorCredential(credentialObj);
 
-    expect(crTest.status).toEqual(CredentialRequestStatus.ISSUED);
-    expect(credential).toBeDefined();
-    expect(credential.id).toEqual(crTest.credentialId);
-    expect(credential.issuer).toEqual(crTest.idv);
-    expect(credential.identifier).toEqual(crTest.credentialItem);
-    expect(credential.claim).toBeDefined();
-    expect(credential.proof).toBeDefined();
-    expect(credential.proof.type).toEqual('CvcMerkleProof2018');
-    expect(credential.proof.merkleRoot).toBeDefined();
-    done();
+    expect(crTest.status).to.equal(CredentialRequestStatus.ISSUED);
+    expect(credential).to.exist;
+    expect(credential.id).to.equal(crTest.credentialId);
+    expect(credential.issuer).to.equal(crTest.idv);
+    expect(credential.identifier).to.equal(crTest.credentialItem);
+    expect(credential.claim).to.exist;
+    expect(credential.proof).to.exist;
+    expect(credential.proof.type).to.equal('CvcMerkleProof2018');
+    expect(credential.proof.merkleRoot).to.exist;
   });
 
-  it('anchorCredential - error', async (done) => {
+  it('anchorCredential - error', async () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
 
@@ -233,13 +229,7 @@ describe('CredentialRequest', () => {
     crTest.acceptedClaims = null;
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
 
-    try {
-      const credential = await crTest.anchorCredential(credentialObj);
-      expect(credential).not.toBeDefined();
-    } catch (err) {
-      expect(err).toBeDefined();
-      expect(crTest.status).toEqual(CredentialRequestStatus.ACCEPTED);
-      done();
-    }
+    const shouldFail = crTest.anchorCredential(credentialObj);
+    return expect(shouldFail).to.be.rejectedWith(Error);
   });
 });

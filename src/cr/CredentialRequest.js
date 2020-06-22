@@ -1,5 +1,5 @@
 const { v4: uuid } = require('uuid');
-const _ = require('lodash');
+const R = require('ramda');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
 const CredentialRequestType = {
@@ -27,12 +27,11 @@ class CredentialRequest {
   }
 
   static fromJSON(obj) {
-    const newCR = new CredentialRequest(null, null, _.merge({}, obj));
-    return newCR;
+    return new CredentialRequest(null, null, R.clone(obj));
   }
 
-  acceptClaims(claims) {
-    const claimInstances = _.map(claims, (claim) => {
+  acceptClaims(claims = []) {
+    const claimInstances = claims.map((claim) => {
       let claimInstance;
       try {
         claimInstance = new Claim(claim.identifier, claim.value); // eslint-disable-line
@@ -46,19 +45,18 @@ class CredentialRequest {
       }
       return claimInstance;
     });
-    const c = _.find(claimInstances, { checkStatus: 'invalid' });
-    if (!_.isNil(c)) {
-      // console.log(`c=${JSON.stringify(c)}`);
-      // TODO better message here:
+    const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
+    if (!R.isNil(c)) {
       throw Error(`There are invalid Claims c=${JSON.stringify(c)}`);
     }
 
-    this.acceptedClaims = _.merge({}, claims);
+    this.acceptedClaims = R.clone(claims);
     this.status = CredentialRequestStatus.ACCEPTED;
   }
 
   createCredential() {
-    const claimInstances = _.map(this.acceptedClaims, (claim) => (new Claim(claim.identifier, claim.value)));
+    const acceptedClaims = this.acceptedClaims || [];
+    const claimInstances = acceptedClaims.map((claim) => (new Claim(claim.identifier, claim.value)));
     const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1);
     this.credentialId = credential.id;
     return credential;

@@ -1,5 +1,5 @@
 const chai = require('chai');
-const _ = require('lodash');
+const R = require('ramda');
 
 const { expect } = chai;
 const {
@@ -39,10 +39,10 @@ describe('ValidationProcess', () => {
   it('should throw an error with an invalid Validation Process', () => {
     const necessaryProperties = ['id', 'state.credential', 'processUrl', 'state.status', 'state.ucaVersion', 'state.ucas'];
     necessaryProperties.forEach((element) => {
-      const invalidationProcessInitialState = _.merge({}, validationProcessInitialState);
-      _.unset(invalidationProcessInitialState, element);
-      const expextToFail = () => new ValidationProcess(invalidationProcessInitialState);
-      expect(expextToFail).to.throw(BadValidationProcessError);
+      const elementPath = element.split('.');
+      const invalidationProcessInitialState = R.dissocPath(elementPath, validationProcessInitialState);
+      const expectToFail = () => new ValidationProcess(invalidationProcessInitialState);
+      expect(expectToFail).to.throw(BadValidationProcessError);
     });
   });
 
@@ -92,13 +92,13 @@ describe('ValidationUCA', () => {
   });
 
   it('should throw an error with no status in ValidationUCA', () => {
-    const expextToFail = () => new ValidationUCA('test', noStatusUCAObj, '1');
-    expect(expextToFail).to.throw(BadValidationUCAError);
+    const expectToFail = () => new ValidationUCA('test', noStatusUCAObj, '1');
+    expect(expectToFail).to.throw(BadValidationUCAError);
   });
 
   it('should throw an error with no name in ValidationUCA', () => {
-    const expextToFail = () => new ValidationUCA('test', noNameUCAObj, '1');
-    expect(expextToFail).to.throw(BadValidationUCAError);
+    const expectToFail = () => new ValidationUCA('test', noNameUCAObj, '1');
+    expect(expectToFail).to.throw(BadValidationUCAError);
   });
 
   describe('with a valid ValidationUCA', () => {
@@ -139,13 +139,13 @@ describe('ValidationUCA', () => {
     });
 
     it('should throw an error with a bad value', () => {
-      const expextToFail = () => new ValidationUCAValue('cvc:Identity:name', badUcaValue, '1');
-      expect(expextToFail).to.throw(BadUCAValueError);
+      const expectToFail = () => new ValidationUCAValue('cvc:Identity:name', badUcaValue, '1');
+      expect(expectToFail).to.throw(BadUCAValueError);
     });
 
     it('should throw an error with no name', () => {
-      const expextToFail = () => new ValidationUCAValue(null, badUcaValue, '1');
-      expect(expextToFail).to.throw(Error);
+      const expectToFail = () => new ValidationUCAValue(null, badUcaValue, '1');
+      expect(expectToFail).to.throw(Error);
     });
 
     it('should accept any value for a non-Civic UCA', () => {
