@@ -6,6 +6,7 @@ const InternalErrors = require('./vp/InternalErrors');
 const Constants = require('./constants/ValidationConstants');
 const Events = require('./vp/Events');
 const Utilities = require('./vp/Utilities');
+const Tasks = require('./vp/Tasks');
 const handlers = require('./vp/Handler');
 
 module.exports = {
@@ -17,5 +18,6 @@ module.exports = {
   InternalErrors,
   Events,
   Utilities,
+  Tasks,
   ...handlers,
 };

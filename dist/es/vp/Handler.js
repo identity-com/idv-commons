@@ -19,7 +19,16 @@ const {
   EventTypes,
   UCAStatus,
   ClientHints
-} = require('../constants/ValidationConstants'); // TODO temp CIV-806
+} = require('../constants/ValidationConstants');
+
+const {
+  getTask,
+  getTaskByName
+} = require('./Tasks');
+
+const {
+  InvalidEventError
+} = require('./InternalErrors'); // TODO temp CIV-806
 
 
 const contextAwareLogger = () => console;
@@ -305,10 +314,65 @@ class ValidatingHandler extends UCAHandler {
   }
 
 }
+/**
+ * The base class for external task event handlers.
+ * The task to apply the handler to can be defined either by id or name.
+ * If name is used, the first task with this name in the process state will be used.
+ */
+
+
+class ExternalTaskHandler extends TypeHandler {
+  constructor(eventType, externalTaskName) {
+    super(eventType);
+    this.externalTaskName = externalTaskName;
+  }
+
+  canHandle(event, state) {
+    if (!super.canHandle(event, state)) return false;
+    const {
+      taskId,
+      taskName
+    } = event.payload;
+    const task = taskId ? getTask(state, taskId) : getTaskByName(state, taskName); // normally we wouldn't throw an error in canHandle, we would just skip the handler
+    // however, if there is no task here it means that something has gone wrong -
+    // the event has a process ID and task ID and if the task ID does not exist in that process,
+    // then the event is invalid
+
+    if (!task) {
+      throw new InvalidEventError(`Unable to find task with ID ${taskId} in process ${state.id}`);
+    }
+
+    return task.name === this.externalTaskName;
+  }
+
+  async handle(state, event) {
+    const {
+      taskId,
+      taskName
+    } = event.payload;
+    const task = taskId ? getTask(state, taskId) : getTaskByName(state, taskName);
+    return this.handleTask(state, event, task);
+  }
+  /**
+   * Manipulate the state based on the event and task. Must return the resultant state
+   * @param state The incoming state
+   * @param event The incoming event
+   * @param task The task this event is related to
+   * @return {*} The outcoming state
+   */
+  // eslint-disable-next-line no-unused-vars
+
+
+  async handleTask(state, event, task) {
+    return state;
+  }
+
+}
 
 module.exports = {
   Handler,
   TypeHandler,
   UCAHandler,
-  ValidatingHandler
+  ValidatingHandler,
+  ExternalTaskHandler
 };

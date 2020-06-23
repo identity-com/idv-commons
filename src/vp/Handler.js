@@ -9,7 +9,8 @@ const {
 const {
   ValidationProcessStatus, EventTypes, UCAStatus, ClientHints,
 } = require('../constants/ValidationConstants');
-const { } = require('./Tasks');
+const { getTask, getTaskByName } = require('./Tasks');
+const { InvalidEventError } = require('./InternalErrors');
 
 // TODO temp CIV-806
 const contextAwareLogger = () => console;

@@ -1,15 +1,22 @@
 /* eslint-disable class-methods-use-this */
 const timestamp = require('unix-timestamp');
-const { v4: uuidV4 } = require('uuid');
+
+const {
+  v4: uuidV4
+} = require('uuid');
+
 const R = require('ramda');
 
 const DEFAULT_TASK_EXPIRY = '48h';
 const TaskType = {
-  POLL: 'Poll',
+  POLL: 'Poll'
 };
 
 function createSimpleTask({
-  name, taskExpiresAfter = DEFAULT_TASK_EXPIRY, externalSystemId, parameters,
+  name,
+  taskExpiresAfter = DEFAULT_TASK_EXPIRY,
+  externalSystemId,
+  parameters
 } = {}) {
   return {
     name,
@@ -17,24 +24,24 @@ function createSimpleTask({
     id: uuidV4(),
     createdAt: new Date(Date.now()).toISOString(),
     expiresAt: new Date(timestamp.now(taskExpiresAfter) * 1000).toISOString(),
-    parameters,
+    parameters
   };
 }
 
 function createPollingTask(options = {}) {
-  const { interval = '1h' } = options;
-  return {
-    ...createSimpleTask(options),
+  const {
+    interval = '1h'
+  } = options;
+  return { ...createSimpleTask(options),
     type: TaskType.POLL,
     interval,
     lastRun: null,
-    runCount: 0,
+    runCount: 0
   };
 }
 
 function isExpired(task) {
   if (task.expired) return true;
-
   const expiresAtDate = new Date(task.expiresAt);
   return expiresAtDate < new Date();
 }
@@ -45,43 +52,35 @@ function nextRunTime(task) {
 }
 
 function shouldRun(task) {
-  return (
-    task.type === TaskType.POLL
-    && !(task.status && task.status === 'COMPLETED')
-    && nextRunTime(task) < new Date()
-    && !isExpired(task)
-  );
+  return task.type === TaskType.POLL && !(task.status && task.status === 'COMPLETED') && nextRunTime(task) < new Date() && !isExpired(task);
 }
 
 function updateTask(task, runTime = new Date()) {
-  return {
-    ...task,
+  return { ...task,
     lastRun: runTime.toISOString(),
-    runCount: task.runCount + 1,
+    runCount: task.runCount + 1
   };
 }
 
-const findTaskByProperty = (state, propName, propVal) => R.find(R.propEq(propName, propVal), state.externalTasks || []);
+const findTaskByProperty = (state, propName, propVal) => R.find(R.propEq(propName, propVal), state.externalTasks || []); // returns the task from the state with the given task ID
 
-// returns the task from the state with the given task ID
-const getTask = (state, id) => findTaskByProperty(state, 'id', id);
 
-// returns the task from the state with the given task name
-const getTaskByName = (state, name) => findTaskByProperty(state, 'name', name);
+const getTask = (state, id) => findTaskByProperty(state, 'id', id); // returns the task from the state with the given task name
 
-// returns the index in the externalTasks array of the given task (or null if not present)
+
+const getTaskByName = (state, name) => findTaskByProperty(state, 'name', name); // returns the index in the externalTasks array of the given task (or null if not present)
 // eslint-disable-next-line no-underscore-dangle
-const findTaskIndex = (state, task) => R.when(R.lt(R.__, 0), R.always(null), R.indexOf(task, state.externalTasks));
 
-// replace the old task with the new task in the state
+
+const findTaskIndex = (state, task) => R.when(R.lt(R.__, 0), R.always(null), R.indexOf(task, state.externalTasks)); // replace the old task with the new task in the state
+
+
 const updateStateTasks = (state, oldTask, newTask) => R.update(findTaskIndex(state, oldTask), newTask, state.externalTasks);
 
-const resolveTask = (state, task, taskStatus) => ({
-  ...state,
-  externalTasks: updateStateTasks(state, task, {
-    ...task,
-    status: taskStatus,
-  }),
+const resolveTask = (state, task, taskStatus) => ({ ...state,
+  externalTasks: updateStateTasks(state, task, { ...task,
+    status: taskStatus
+  })
 });
 
 module.exports = {
@@ -97,5 +96,5 @@ module.exports = {
   updateStateTasks,
   resolveTask,
   DEFAULT_TASK_EXPIRY,
-  TaskType,
+  TaskType
 };
