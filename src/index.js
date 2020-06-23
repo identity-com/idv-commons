@@ -5,6 +5,7 @@ const ValidationErrors = require('./vp/ValidationErrors');
 const InternalErrors = require('./vp/InternalErrors');
 const Constants = require('./constants/ValidationConstants');
 const Events = require('./vp/Events');
+const Utilities = require('./vp/Utilities');
 const handlers = require('./vp/Handler');
 
 module.exports = {
@@ -15,5 +16,6 @@ module.exports = {
   ValidationErrors,
   InternalErrors,
   Events,
+  Utilities,
   ...handlers,
 };
