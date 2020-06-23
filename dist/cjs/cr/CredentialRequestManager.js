@@ -1,16 +1,20 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
+const R = require('ramda');
+
 const credentialCommons = require('@identity.com/credential-commons');
-const { CredentialRequest } = require('./CredentialRequest');
+
+const {
+  CredentialRequest
+} = require('./CredentialRequest');
 
 class CredentialRequestManager {
   constructor(options) {
     this.options = options;
-    const anchorServicePluginImpl = _.get(options, 'serverConfig.anchorService.pluginImpl');
+    const anchorServicePluginImpl = R.path(['serverConfig', 'anchorService', 'pluginImpl'], options);
+
     if (anchorServicePluginImpl) {
-      const anchorServicePluginConfig = _.get(options, 'serverConfig.anchorService.pluginConfig');
-      // console.log(anchorServicePluginConfig);
+      const anchorServicePluginConfig = R.path(['serverConfig', 'anchorService', 'pluginConfig'], options);
       anchorServicePluginImpl(credentialCommons, anchorServicePluginConfig);
     }
   }
@@ -18,6 +22,7 @@ class CredentialRequestManager {
   createCredentialRequest(credentialItem) {
     return new CredentialRequest(credentialItem, this.options.serverConfig);
   }
+
 }
 
 module.exports = CredentialRequestManager;
