@@ -22,6 +22,8 @@ const Events = require('./vp/Events');
 
 const Utilities = require('./vp/Utilities');
 
+const Tasks = require('./vp/Tasks');
+
 const handlers = require('./vp/Handler');
 
 module.exports = _objectSpread({
@@ -32,5 +34,6 @@ module.exports = _objectSpread({
   ValidationErrors,
   InternalErrors,
   Events,
-  Utilities
+  Utilities,
+  Tasks
 }, handlers);
