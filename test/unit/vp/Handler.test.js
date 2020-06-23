@@ -4,8 +4,8 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 
-const { UCAStatus, ValidationProcessStatus } = require('../../../src/constants/ValidationConstants');
-const { EventTypes, create } = require('../../../src/vp/Events');
+const { UCAStatus, ValidationProcessStatus, EventTypes } = require('../../../src/constants/ValidationConstants');
+const { create } = require('../../../src/vp/Events');
 const { MissingUCAError, UCAUpdateError } = require('../../../src/vp/InternalErrors');
 const {
   Handler, TypeHandler, UCAHandler,
