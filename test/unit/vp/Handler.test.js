@@ -6,7 +6,7 @@ const sinon = require('sinon');
 
 const { UCAStatus, ValidationProcessStatus } = require('../../../src/constants/ValidationConstants');
 const { EventTypes, create } = require('../../../src/vp/Events');
-const { MissingUCAError, UCAUpdateError } = require('../../../src/vp/Errors');
+const { MissingUCAError, UCAUpdateError } = require('../../../src/vp/InternalErrors');
 const {
   Handler, TypeHandler, UCAHandler,
 } = require('../../../src/vp/Handler');

@@ -1,6 +1,6 @@
 const R = require('ramda');
 
-const { InvalidEventError } = require('./Errors');
+const { InvalidEventError } = require('./InternalErrors');
 const { EventTypes } = require('../constants/ValidationConstants');
 
 const eventCreators = {};
@@ -70,5 +70,5 @@ addEventCreator(EventTypes.EXTERNAL_TASK_POLL, taskEventPayloadFn);
 const create = (type, options) => eventCreators[type](options);
 
 module.exports = {
-  create
+  create,
 };

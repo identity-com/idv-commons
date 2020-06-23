@@ -14,6 +14,8 @@ const ValidationProcess = require('./vp/ValidationProcess');
 
 const ValidationErrors = require('./vp/ValidationErrors');
 
+const InternalErrors = require('./vp/InternalErrors');
+
 const Constants = require('./constants/ValidationConstants');
 
 const Events = require('./vp/Events');
@@ -26,5 +28,6 @@ module.exports = _objectSpread({
   Constants,
   ValidationProcess,
   ValidationErrors,
+  InternalErrors,
   Events
 }, handlers);

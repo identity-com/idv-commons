@@ -14,7 +14,7 @@ const R = require('ramda');
 
 const {
   InvalidEventError
-} = require('./Errors');
+} = require('./InternalErrors');
 
 const {
   EventTypes

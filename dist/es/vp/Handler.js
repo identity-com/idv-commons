@@ -37,7 +37,7 @@ const {
   UCAUpdateError,
   UCAVersionError,
   UCAValueError
-} = require('./Errors');
+} = require('./InternalErrors');
 /**
  * Defines some helper classes for defining handlers. Handlers are defined as a function:
  * (state, event) -> state  (or (state, event) -> Promise(state))
