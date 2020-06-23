@@ -1,5 +1,10 @@
-const _ = require('lodash');
-const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
+const R = require('ramda');
+
+const {
+  definitions,
+  UserCollectableAttribute
+} = require('@identity.com/uca');
+
 const {
   BadUCAValueError,
   BadValidationProcessError,
@@ -7,9 +12,7 @@ const {
 } = require('./ValidationErrors');
 
 const validIdentifiers = definitions.map(d => d.identifier);
-
 const defaultUcaVersion = '1';
-
 /*
 * ValidationUCAValue
 * This class is instantiated by the ValidationUCA in the getValueObj method and allows
@@ -17,6 +20,7 @@ const defaultUcaVersion = '1';
 * If the value is good, the class is instantiated, and the 'serialize' method returns an object
 * ready for sending to the VM
 */
+
 class ValidationUCAValue {
   constructor(name, value, ucaVersion) {
     this.name = name;
@@ -27,7 +31,7 @@ class ValidationUCAValue {
 
   setValue(value) {
     // check that the input value is valid for this type of UCA
-    if (this.name && _.includes(validIdentifiers, this.name)) {
+    if (this.name && validIdentifiers.includes(this.name)) {
       // instantiate a UCA to check the value
       try {
         // eslint-disable-next-line no-unused-vars
@@ -36,15 +40,17 @@ class ValidationUCAValue {
         throw new BadUCAValueError(this.name, value, error);
       }
     }
-    this.value = value;
-  }
 
-  // value can be any type, including an object
+    this.value = value;
+  } // value can be any type, including an object
+
+
   serialize() {
     return {
       value: this.value
     };
   }
+
 }
 /*
 * ValidationUCA
@@ -60,21 +66,24 @@ class ValidationUCAValue {
 * The method 'getValueObj(value) can be used to validate the value for this UCA by instantiating the
 * ValidationUCAValue class. If the value is good, the result is a valid object for sending to the VM
 */
+
+
 class ValidationUCA {
   constructor(ucaMapId, ucaObj, ucaVersion = defaultUcaVersion, dependsOnStatus) {
     const getOrThrow = (obj, key) => {
-      const retVal = _.get(obj, key);
+      const retVal = R.prop(key, obj);
       if (retVal) return retVal;
       throw new BadValidationUCAError(`${key} not present in ${obj}`);
-    };
-    // the ucaMapId is the string reference used in the process to refer to this UCA
+    }; // the ucaMapId is the string reference used in the process to refer to this UCA
     // it is also used in the URL for patching values to this UCA
+
+
     this.ucaMapId = ucaMapId;
     this.ucaName = getOrThrow(ucaObj, 'name');
     this.status = getOrThrow(ucaObj, 'status');
     this.ucaVersion = ucaVersion;
     this.dependsOnStatus = dependsOnStatus;
-    this.dependsOn = _.get(ucaObj, 'dependsOn', []);
+    this.dependsOn = R.propOr([], 'dependsOn', ucaObj);
   }
 
   get url() {
@@ -90,12 +99,14 @@ class ValidationUCA {
   get dependsOnArray() {
     if (!this.dependsOnValidationUcas && this.dependsOn && this.dependsOn.length > 0) {
       // eslint-disable-next-line no-unused-vars, no-undef
-      this.dependsOnValidationUcas = _.map(this.dependsOn, dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
+      this.dependsOnValidationUcas = this.dependsOn.map(dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
     } else {
       this.dependsOnValidationUcas = [];
     }
+
     return this.dependsOnValidationUcas;
   }
+
 }
 /*
 * The ValidationProcess class is used to parse or create a response from the ValidationModule (VM)
@@ -112,33 +123,41 @@ class ValidationUCA {
 * helper methods to get an array of ValidationUCAs are provided, and these should be used rather than
 * delaing with the ucas array directly
 */
+
+
 class ValidationProcess {
   constructor(processObj) {
     const getOrThrow = (obj, key) => {
-      const retVal = _.get(obj, key);
+      const retVal = R.path(key, obj);
       if (retVal) return retVal;
-      throw new BadValidationProcessError(`${key} not present in ${obj}`);
+      throw new BadValidationProcessError(`${key} not present in ${JSON.stringify(obj)}`);
     };
-    this.id = getOrThrow(processObj, 'id');
-    this.credentialItem = getOrThrow(processObj, 'state.credential');
-    this.processUrl = getOrThrow(processObj, 'processUrl');
-    this.status = getOrThrow(processObj, 'state.status');
-    this.ucaVersion = getOrThrow(processObj, 'state.ucaVersion');
-    this.ucas = getOrThrow(processObj, 'state.ucas');
+
+    this.id = getOrThrow(processObj, ['id']);
+    this.credentialItem = getOrThrow(processObj, ['state', 'credential']);
+    this.processUrl = getOrThrow(processObj, ['processUrl']);
+    this.status = getOrThrow(processObj, ['state', 'status']);
+    this.ucaVersion = getOrThrow(processObj, ['state', 'ucaVersion']);
+    this.ucas = getOrThrow(processObj, ['state', 'ucas']);
   }
 
   getValidationUcas() {
     if (!this.validationUcas) {
-      this.validationUcas = _.map(Object.entries(this.ucas), ([ucaId, ucaObj]) => new ValidationUCA(ucaId, ucaObj, this.ucaVersion));
+      this.validationUcas = Object.entries(this.ucas).map(([ucaId, ucaObj]) => new ValidationUCA(ucaId, ucaObj, this.ucaVersion));
     }
+
     return this.validationUcas;
   }
 
   getValidationUcasByStatus(status) {
-    return _.filter(this.getValidationUcas(), vUca => vUca.status === status);
+    return this.getValidationUcas().filter(R.propEq('status', status));
   }
+
 }
 
 module.exports = {
-  ValidationProcess, ValidationUCA, ValidationUCAValue, BadUCAValueError
+  ValidationProcess,
+  ValidationUCA,
+  ValidationUCAValue,
+  BadUCAValueError
 };

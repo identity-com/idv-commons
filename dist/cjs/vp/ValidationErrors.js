@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 class BadUCAValueError extends Error {
   constructor(ucaId, value, error) {
@@ -8,18 +8,23 @@ class BadUCAValueError extends Error {
     this.ucaId = ucaId;
     this.value = value;
   }
+
 }
+
 class BadValidationProcessError extends Error {
   constructor(error) {
     super(error);
     this.name = 'BadValidationProcessError';
   }
+
 }
+
 class BadValidationUCAError extends Error {
   constructor(error) {
     super(error);
     this.name = 'BadValidationUCAError';
   }
+
 }
 
 module.exports = {
