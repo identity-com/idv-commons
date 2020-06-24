@@ -11,16 +11,7 @@ const {
 } = require('../constants/ValidationConstants');
 const { getTask, getTaskByName } = require('./Tasks');
 const { InvalidEventError } = require('./InternalErrors');
-
-// TODO temp CIV-806
-const contextAwareLogger = () => console;
-const log = {
-  silly: (...args) => console.debug(...args),
-  debug: (...args) => console.debug(...args),
-  info: (...args) => console.info(...args),
-  warn: (...args) => console.warn(...args),
-  error: (...args) => console.error(...args),
-};
+const Context = require('./Context');
 
 const {
   MissingUCAError, UCAUpdateError, UCAVersionError, UCAValueError,
@@ -119,7 +110,8 @@ class TypeHandler extends Handler {
  * @param processState The overall process state
  */
 function checkUCAIsUpdateable(uca, processState) {
-  log.silly(`Evaluating if UCA: ${JSON.stringify(uca)} is receivable`);
+  const logger = Context.contextAwareLogger(processState);
+  logger.silly(`Evaluating if UCA: ${JSON.stringify(uca)} is receivable`);
   if (!uca.status) {
     throw new UCAUpdateError(
       'Unable to determine if the UCA can be updated as it has no status',
@@ -214,7 +206,7 @@ class UCAHandler extends TypeHandler {
    * @return {{ucas}|*} the resultant state
    */
   async handle(state, event) {
-    const logger = contextAwareLogger(state, log);
+    const logger = Context.contextAwareLogger(state);
     const { ucaId, value } = event.payload;
 
     const ucaState = state.ucas[ucaId];
