@@ -24,6 +24,8 @@ const Utilities = require('./vp/Utilities');
 
 const Tasks = require('./vp/Tasks');
 
+const Context = require('./vp/Context');
+
 const handlers = require('./vp/Handler');
 
 module.exports = _objectSpread({
@@ -35,5 +37,6 @@ module.exports = _objectSpread({
   InternalErrors,
   Events,
   Utilities,
-  Tasks
+  Tasks,
+  Context
 }, handlers);
