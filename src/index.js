@@ -7,6 +7,7 @@ const Constants = require('./constants/ValidationConstants');
 const Events = require('./vp/Events');
 const Utilities = require('./vp/Utilities');
 const Tasks = require('./vp/Tasks');
+const Context = require('./vp/Context');
 const handlers = require('./vp/Handler');
 
 module.exports = {
@@ -19,5 +20,6 @@ module.exports = {
   Events,
   Utilities,
   Tasks,
+  Context,
   ...handlers,
 };
