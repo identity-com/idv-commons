@@ -1,31 +1,7 @@
 const R = require('ramda');
 
-const { InvalidEventError } = require('./Errors');
-
-/**
- * An enum of event types.
- *
- * 'Process' refers to a validation process, triggered by a user requesting a credential.
- * UCA is a User Collectible Attribute, that is used to validate the user
- * @type {{UCA_STATUS_CHANGED: string, PROCESS_STATUS_CHANGED: string, PROCESS_UPDATED: string,
- * PROCESS_CREATED: string, UCA_RECEIVED: string}}
- */
-const EventTypes = {
-  // A new process has been created
-  PROCESS_CREATED: 'Process Created',
-  // The process status has been changed
-  PROCESS_STATUS_CHANGED: 'Process Status Changed',
-  // In a dynamic validation process plan, new UCA requests can be added ad-hoc to a running process
-  PROCESS_UPDATED: 'Process Updated',
-  // The user has responded with an answer to a UCA request
-  UCA_RECEIVED: 'UCA Received',
-  // A UCA status has been changed
-  UCA_STATUS_CHANGED: 'UCA Status Changed',
-  // A notification from an external task (either a completion event or a progress update)
-  EXTERNAL_TASK_UPDATE: 'External Task Update',
-  // An external service needs to be polled to check the status of the the external task
-  EXTERNAL_TASK_POLL: 'External Task Poll',
-};
+const { InvalidEventError } = require('./InternalErrors');
+const { EventTypes } = require('../constants/ValidationConstants');
 
 const eventCreators = {};
 
@@ -94,6 +70,5 @@ addEventCreator(EventTypes.EXTERNAL_TASK_POLL, taskEventPayloadFn);
 const create = (type, options) => eventCreators[type](options);
 
 module.exports = {
-  EventTypes,
   create,
 };

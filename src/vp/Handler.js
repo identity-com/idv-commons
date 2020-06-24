@@ -22,7 +22,7 @@ const log = {
 
 const {
   MissingUCAError, UCAUpdateError, UCAVersionError, UCAValueError,
-} = require('./Errors');
+} = require('./InternalErrors');
 
 /**
  * Defines some helper classes for defining handlers. Handlers are defined as a function:
