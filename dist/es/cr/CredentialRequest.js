@@ -1,13 +1,18 @@
+const {
+  v4: uuid
+} = require('uuid');
 
-const uuidv4 = require('uuid/v4');
-const _ = require('lodash');
-const { VC, Claim } = require('@identity.com/credential-commons');
+const R = require('ramda');
+
+const {
+  VC,
+  Claim
+} = require('@identity.com/credential-commons');
 
 const CredentialRequestType = {
   INTERACTIVE: 'interactive',
   DIRECT: 'direct'
 };
-
 const CredentialRequestStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
@@ -18,7 +23,7 @@ const CredentialRequestStatus = {
 
 class CredentialRequest {
   constructor(credentialItem, config, jsonObj) {
-    this.id = jsonObj && jsonObj.id || uuidv4();
+    this.id = jsonObj && jsonObj.id || uuid();
     this.credentialItem = jsonObj && jsonObj.credentialItem || credentialItem;
     this.idv = jsonObj && jsonObj.idv || config && config.idvDid;
     this.status = jsonObj && jsonObj.status || CredentialRequestStatus.PENDING;
@@ -28,15 +33,16 @@ class CredentialRequest {
   }
 
   static fromJSON(obj) {
-    const newCR = new CredentialRequest(null, null, _.merge({}, obj));
-    return newCR;
+    return new CredentialRequest(null, null, R.clone(obj));
   }
 
-  acceptClaims(claims) {
-    const claimInstances = _.map(claims, claim => {
+  acceptClaims(claims = []) {
+    const claimInstances = claims.map(claim => {
       let claimInstance;
+
       try {
         claimInstance = new Claim(claim.identifier, claim.value); // eslint-disable-line
+
         claimInstance.checkStatus = 'valid';
       } catch (err) {
         claimInstance = {
@@ -45,36 +51,38 @@ class CredentialRequest {
           claim
         };
       }
+
       return claimInstance;
     });
-    const c = _.find(claimInstances, { checkStatus: 'invalid' });
-    if (!_.isNil(c)) {
-      // console.log(`c=${JSON.stringify(c)}`);
-      // TODO better message here:
+    const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
+
+    if (!R.isNil(c)) {
       throw Error(`There are invalid Claims c=${JSON.stringify(c)}`);
     }
 
-    this.acceptedClaims = _.merge({}, claims);
+    this.acceptedClaims = R.clone(claims);
     this.status = CredentialRequestStatus.ACCEPTED;
   }
 
   createCredential() {
-    const claimInstances = _.map(this.acceptedClaims, claim => new Claim(claim.identifier, claim.value));
+    const acceptedClaims = this.acceptedClaims || [];
+    const claimInstances = acceptedClaims.map(claim => new Claim(claim.identifier, claim.value));
     const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1);
     this.credentialId = credential.id;
     return credential;
   }
 
   async anchorCredential(credentialObj, options) {
-    try {
-      const credential = VC.fromJSON(credentialObj);
-      const anchoredCredential = await credential.requestAnchor(options);
-      this.status = CredentialRequestStatus.ISSUED;
-      return anchoredCredential;
-    } catch (err) {
-      throw err;
-    }
+    const credential = VC.fromJSON(credentialObj);
+    const anchoredCredential = await credential.requestAnchor(options);
+    this.status = CredentialRequestStatus.ISSUED;
+    return anchoredCredential;
   }
+
 }
 
-module.exports = { CredentialRequest, CredentialRequestStatus, CredentialRequestType };
+module.exports = {
+  CredentialRequest,
+  CredentialRequestStatus,
+  CredentialRequestType
+};

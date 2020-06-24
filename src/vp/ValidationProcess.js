@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const R = require('ramda');
 const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
 const {
   BadUCAValueError,
@@ -6,7 +6,7 @@ const {
   BadValidationUCAError,
 } = require('./ValidationErrors');
 
-const validIdentifiers = definitions.map(d => d.identifier);
+const validIdentifiers = definitions.map((d) => d.identifier);
 
 const defaultUcaVersion = '1';
 
@@ -27,7 +27,7 @@ class ValidationUCAValue {
 
   setValue(value) {
     // check that the input value is valid for this type of UCA
-    if (this.name && _.includes(validIdentifiers, this.name)) {
+    if (this.name && validIdentifiers.includes(this.name)) {
       // instantiate a UCA to check the value
       try {
         // eslint-disable-next-line no-unused-vars
@@ -63,7 +63,7 @@ class ValidationUCAValue {
 class ValidationUCA {
   constructor(ucaMapId, ucaObj, ucaVersion = defaultUcaVersion, dependsOnStatus) {
     const getOrThrow = (obj, key) => {
-      const retVal = _.get(obj, key);
+      const retVal = R.prop(key, obj);
       if (retVal) return retVal;
       throw new BadValidationUCAError(`${key} not present in ${obj}`);
     };
@@ -74,7 +74,7 @@ class ValidationUCA {
     this.status = getOrThrow(ucaObj, 'status');
     this.ucaVersion = ucaVersion;
     this.dependsOnStatus = dependsOnStatus;
-    this.dependsOn = _.get(ucaObj, 'dependsOn', []);
+    this.dependsOn = R.propOr([], 'dependsOn', ucaObj);
   }
 
   get url() {
@@ -90,7 +90,7 @@ class ValidationUCA {
   get dependsOnArray() {
     if (!this.dependsOnValidationUcas && this.dependsOn && this.dependsOn.length > 0) {
       // eslint-disable-next-line no-unused-vars, no-undef
-      this.dependsOnValidationUcas = _.map(this.dependsOn, dependsOnObj => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
+      this.dependsOnValidationUcas = this.dependsOn.map((dependsOnObj) => new ValidationUCA(null, dependsOnObj.uca, this.ucaVersion, dependsOnObj.status));
     } else {
       this.dependsOnValidationUcas = [];
     }
@@ -115,27 +115,27 @@ class ValidationUCA {
 class ValidationProcess {
   constructor(processObj) {
     const getOrThrow = (obj, key) => {
-      const retVal = _.get(obj, key);
+      const retVal = R.path(key, obj);
       if (retVal) return retVal;
-      throw new BadValidationProcessError(`${key} not present in ${obj}`);
+      throw new BadValidationProcessError(`${key} not present in ${JSON.stringify(obj)}`);
     };
-    this.id = getOrThrow(processObj, 'id');
-    this.credentialItem = getOrThrow(processObj, 'state.credential');
-    this.processUrl = getOrThrow(processObj, 'processUrl');
-    this.status = getOrThrow(processObj, 'state.status');
-    this.ucaVersion = getOrThrow(processObj, 'state.ucaVersion');
-    this.ucas = getOrThrow(processObj, 'state.ucas');
+    this.id = getOrThrow(processObj, ['id']);
+    this.credentialItem = getOrThrow(processObj, ['state', 'credential']);
+    this.processUrl = getOrThrow(processObj, ['processUrl']);
+    this.status = getOrThrow(processObj, ['state', 'status']);
+    this.ucaVersion = getOrThrow(processObj, ['state', 'ucaVersion']);
+    this.ucas = getOrThrow(processObj, ['state', 'ucas']);
   }
 
   getValidationUcas() {
     if (!this.validationUcas) {
-      this.validationUcas = _.map(Object.entries(this.ucas), ([ucaId, ucaObj]) => new ValidationUCA(ucaId, ucaObj, this.ucaVersion));
+      this.validationUcas = Object.entries(this.ucas).map(([ucaId, ucaObj]) => new ValidationUCA(ucaId, ucaObj, this.ucaVersion));
     }
     return this.validationUcas;
   }
 
   getValidationUcasByStatus(status) {
-    return _.filter(this.getValidationUcas(), vUca => (vUca.status === status));
+    return this.getValidationUcas().filter(R.propEq('status', status));
   }
 }
 

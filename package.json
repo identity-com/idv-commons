@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -18,8 +18,8 @@
   "browser": "dist/browser/index.js",
   "scripts": {
     "lint": "eslint ./src ./test --max-warnings=0",
-    "test": "cross-env NODE_ENV=false jest test/unit",
-    "test:watch": "jest --watch",
+    "lint:autofix": "eslint --fix ./src ./test --max-warnings=0",
+    "test": "cross-env NODE_ENV=false nyc mocha --recursive test/unit",
     "build:cjs": "BABEL_ENV=cjs babel src -d build/cjs",
     "build:es": "babel src -d build/es --no-babelrc",
     "build:browser:before": "BABEL_ENV=browser babel src -d build/prebrowser",
@@ -38,61 +38,42 @@
     "check": "npm run lint && npm run test"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.24.1",
-    "babel-jest": "^24.8.0",
+    "@babel/cli": "^7.10.3",
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
+    "@babel/preset-env": "^7.10.3",
     "babel-minify": "^0.4.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "chai": "^4.1.2",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^17.1.1",
-    "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-loader": "^2.2.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-no-only-tests": "^2.3.1",
-    "eslint-plugin-react": "^7.14.3",
-    "husky": "^1.1.2",
-    "jest": "^24.8.0",
-    "jest-html-reporter": "^2.5.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "7.2.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-no-only-tests": "^2.4.0",
+    "eslint-plugin-react": "^7.20.0",
+    "husky": "^4.2.5",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
     "request-debug": "^0.2.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^3.0.2",
+    "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.0.32",
+    "@identity.com/credential-commons": "1.0.33",
     "@identity.com/uca": "1.0.16",
-    "lodash": "^4.17.15",
-    "uuid": "^3.3.2"
+    "ramda": "^0.27.0",
+    "unix-timestamp": "^0.2.0",
+    "uuid": "^8.1.0"
   },
-  "jest": {
-    "modulePathIgnorePatterns": [
-      "<rootDir>/build/"
-    ],
-    "collectCoverageFrom": [
-      "**/src/**/*.{js}",
-      "!**/node_modules/**",
-      "!**/build/**",
-      "!**/vendor/**",
-      "!src/services/DummyAnchorServiceImpl.js",
-      "!src/services/anchorService.js"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 85,
-        "functions": 85,
-        "lines": 85,
-        "statements": 85
-      }
-    },
-    "coverageDirectory": "reports/coverage",
-    "collectCoverage": true,
-    "testResultsProcessor": "./node_modules/jest-html-reporter",
-    "verbose": true
-  },
-  "jest-html-reporter": {
-    "pageTitle": "Credential Request and Interactive Validation Framework Test Suite",
-    "outputPath": "reports/test-report.html",
-    "includeFailureMsg": true
+  "nyc": {
+    "lines": 99,
+    "statements": 99,
+    "functions": 98,
+    "branches": 98,
+    "exclude": [
+      "test/*"
+    ]
   }
 }

@@ -1,16 +1,24 @@
-'use strict';
+"use strict";
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
-const uuidv4 = require('uuid/v4');
-const _ = require('lodash');
-const { VC, Claim } = require('@identity.com/credential-commons');
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+const {
+  v4: uuid
+} = require('uuid');
+
+const R = require('ramda');
+
+const {
+  VC,
+  Claim
+} = require('@identity.com/credential-commons');
 
 const CredentialRequestType = {
   INTERACTIVE: 'interactive',
   DIRECT: 'direct'
 };
-
 const CredentialRequestStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
@@ -21,7 +29,7 @@ const CredentialRequestStatus = {
 
 class CredentialRequest {
   constructor(credentialItem, config, jsonObj) {
-    this.id = jsonObj && jsonObj.id || uuidv4();
+    this.id = jsonObj && jsonObj.id || uuid();
     this.credentialItem = jsonObj && jsonObj.credentialItem || credentialItem;
     this.idv = jsonObj && jsonObj.idv || config && config.idvDid;
     this.status = jsonObj && jsonObj.status || CredentialRequestStatus.PENDING;
@@ -31,15 +39,16 @@ class CredentialRequest {
   }
 
   static fromJSON(obj) {
-    const newCR = new CredentialRequest(null, null, _.merge({}, obj));
-    return newCR;
+    return new CredentialRequest(null, null, R.clone(obj));
   }
 
-  acceptClaims(claims) {
-    const claimInstances = _.map(claims, claim => {
+  acceptClaims(claims = []) {
+    const claimInstances = claims.map(claim => {
       let claimInstance;
+
       try {
         claimInstance = new Claim(claim.identifier, claim.value); // eslint-disable-line
+
         claimInstance.checkStatus = 'valid';
       } catch (err) {
         claimInstance = {
@@ -48,21 +57,22 @@ class CredentialRequest {
           claim
         };
       }
+
       return claimInstance;
     });
-    const c = _.find(claimInstances, { checkStatus: 'invalid' });
-    if (!_.isNil(c)) {
-      // console.log(`c=${JSON.stringify(c)}`);
-      // TODO better message here:
+    const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
+
+    if (!R.isNil(c)) {
       throw Error(`There are invalid Claims c=${JSON.stringify(c)}`);
     }
 
-    this.acceptedClaims = _.merge({}, claims);
+    this.acceptedClaims = R.clone(claims);
     this.status = CredentialRequestStatus.ACCEPTED;
   }
 
   createCredential() {
-    const claimInstances = _.map(this.acceptedClaims, claim => new Claim(claim.identifier, claim.value));
+    const acceptedClaims = this.acceptedClaims || [];
+    const claimInstances = acceptedClaims.map(claim => new Claim(claim.identifier, claim.value));
     const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1);
     this.credentialId = credential.id;
     return credential;
@@ -72,16 +82,17 @@ class CredentialRequest {
     var _this = this;
 
     return _asyncToGenerator(function* () {
-      try {
-        const credential = VC.fromJSON(credentialObj);
-        const anchoredCredential = yield credential.requestAnchor(options);
-        _this.status = CredentialRequestStatus.ISSUED;
-        return anchoredCredential;
-      } catch (err) {
-        throw err;
-      }
+      const credential = VC.fromJSON(credentialObj);
+      const anchoredCredential = yield credential.requestAnchor(options);
+      _this.status = CredentialRequestStatus.ISSUED;
+      return anchoredCredential;
     })();
   }
+
 }
 
-module.exports = { CredentialRequest, CredentialRequestStatus, CredentialRequestType };
+module.exports = {
+  CredentialRequest,
+  CredentialRequestStatus,
+  CredentialRequestType
+};

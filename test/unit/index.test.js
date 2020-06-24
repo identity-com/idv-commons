@@ -1,7 +1,9 @@
+const { expect } = require('chai');
+
 const idvCommons = require('../../src');
 
 describe('index.js test', () => {
-  it('Should instanciate', () => {
+  it('Should instantiate', () => {
     const {
       CredentialRequestManager,
       CredentialRequest,
@@ -9,11 +11,11 @@ describe('index.js test', () => {
       ValidationProcess,
       ValidationErrors,
     } = idvCommons;
-    expect(CredentialRequestManager).toBeDefined();
-    expect(CredentialRequest).toBeDefined();
-    expect(Constants.ValidationProcessStatus).toBeDefined();
-    expect(Constants.UCAStatus).toBeDefined();
-    expect(ValidationProcess).toBeDefined();
-    expect(ValidationErrors).toBeDefined();
+    expect(CredentialRequestManager).to.exist;
+    expect(CredentialRequest).to.exist;
+    expect(Constants.ValidationProcessStatus).to.exist;
+    expect(Constants.UCAStatus).to.exist;
+    expect(ValidationProcess).to.exist;
+    expect(ValidationErrors).to.exist;
   });
 });

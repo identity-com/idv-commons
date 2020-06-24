@@ -1,11 +1,11 @@
 {
   "validationProcessInitialState": {
-    "id": "66500737-7e37-472c-a965-0deb91bb006d",
-    "processUrl": "/processes/66500737-7e37-472c-a965-0deb91bb006d",
+    "id": "001",
+    "processUrl": "/processes/001",
     "state": {
       "status": "IN_PROGRESS",
       "ucaVersion": "1",
-      "credential": "credential-cvc:IDVaaS-v1",
+      "credential": "credential-myCredential-v1",
       "ucas": {
         "name": {
           "name": "cvc:Identity:name",
@@ -27,11 +27,7 @@
           "name": "cvc:SocialSecurity:number",
           "status": "AWAITING_USER_INPUT"
         },
-        "countryCode": {
-          "name": "cvc:PhoneNumber:countryCode",
-          "status": "AWAITING_USER_INPUT"
-        },
-        "number": {
+        "phoneNumber": {
           "name": "cvc:PhoneNumber:number",
           "status": "AWAITING_USER_INPUT"
         },
@@ -39,13 +35,6 @@
           "name": "cvc:Verify:phoneNumberToken",
           "status": "AWAITING_DEPENDENCY",
           "dependsOn": [
-            {
-              "status": "VALIDATING",
-              "uca": {
-                "name": "cvc:PhoneNumber:countryCode",
-                "status": "AWAITING_USER_INPUT"
-              }
-            },
             {
               "status": "VALIDATING",
               "uca": {
@@ -59,12 +48,12 @@
     }
   },
   "validationProcessOneAwaitingUserInputTwoAccepted": {
-    "id": "66500737-7e37-472c-a965-0deb91bb006d",
-    "processUrl": "/processes/66500737-7e37-472c-a965-0deb91bb006d",
+    "id": "002",
+    "processUrl": "/processes/002",
     "state": {
       "status": "IN_PROGRESS",
       "ucaVersion": "1",
-      "credential": "credential-cvc:IDVaaS-v1",
+      "credential": "credential-myCredential-v1",
       "ucas": {
         "name": {
           "name": "cvc:Identity:name",
@@ -96,7 +85,7 @@
     "status": "AWAITING_USER_INPUT"
   },
   "nameUcaVal": {
-		"givenNames":"Terence9",			
+		"givenNames":"Terence9",
 		"otherNames":"äüö ßßß",
 		"familyNames":"O'multiple names-with-hyphens"
   },
@@ -121,7 +110,7 @@
     ]
   },
   "goodUcaValue": {
-		"givenNames":"Terence9",			
+		"givenNames":"Terence9",
 		"otherNames":"äüö ßßß",
 		"familyNames":"O'multiple names-with-hyphens"
   },
