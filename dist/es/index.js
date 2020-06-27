@@ -18,6 +18,8 @@ const Tasks = require('./vp/Tasks');
 
 const Context = require('./vp/Context');
 
+const Routes = require('./vp/Routes');
+
 const handlers = require('./vp/Handler');
 
 module.exports = {
@@ -31,5 +33,6 @@ module.exports = {
   Utilities,
   Tasks,
   Context,
+  Routes,
   ...handlers
 };
