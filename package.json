@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -33,7 +33,7 @@
     "clean": "npm run build:clean && npm run dist:clean",
     "postversion": "git add --all && git commit -m\"build and version $npm_package_version\" -m\"[skip ci]\" && git push",
     "pretag": "git fetch --tags",
-    "tag": "git tag v$npm_package_version && git push origin --tags",
+    "tag": "git tag $npm_package_version && git push origin --tags",
     "precommit": "npm run lint",
     "check": "npm run lint && npm run test"
   },
