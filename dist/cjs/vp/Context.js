@@ -1,5 +1,7 @@
 "use strict";
 
+const R = require('ramda');
+
 let appSingleton;
 
 const contextAwareLogger = (state, log) => ({
@@ -40,7 +42,9 @@ const context = {
   },
 
   get log() {
-    return context.app ? context.app.log() : consoleLogger;
+    if (!R.has('log', appSingleton)) return consoleLogger;
+    if (R.is(Function, appSingleton.log)) return appSingleton.log();
+    return appSingleton.log;
   },
 
   get handlerConfig() {
