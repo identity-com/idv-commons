@@ -8,7 +8,7 @@ const ValidationErrors = require('./vp/ValidationErrors');
 
 const InternalErrors = require('./vp/InternalErrors');
 
-const Constants = require('./constants/ValidationConstants');
+const Constants = require('./constants');
 
 const Events = require('./vp/Events');
 

@@ -1,0 +1,1 @@
+"use strict";var Role={ADMIN:"ADMIN"},ROLE_HEADER="X-IDVToolkit-Role";module.exports={Role:Role,ROLE_HEADER:ROLE_HEADER};
