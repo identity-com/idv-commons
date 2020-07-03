@@ -28,7 +28,10 @@ const context = {
     return appSingleton;
   },
   get log() {
-    if (!R.has('log', appSingleton)) return consoleLogger;
+    if (!R.has('log', appSingleton)) {
+      consoleLogger.warn('Context.log: No logger available on the app, falling back to console logger.')
+      return consoleLogger;
+    }
     if (R.is(Function, appSingleton.log)) return appSingleton.log();
     return appSingleton.log;
   },
