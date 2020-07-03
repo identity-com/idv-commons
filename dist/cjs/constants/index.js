@@ -6,40 +6,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-const CredentialRequest = require('./cr/CredentialRequest');
+const ValidationConstants = require('./ValidationConstants');
 
-const CredentialRequestManager = require('./cr/CredentialRequestManager');
+const AuthConstants = require('./AuthConstants');
 
-const ValidationProcess = require('./vp/ValidationProcess');
-
-const ValidationErrors = require('./vp/ValidationErrors');
-
-const InternalErrors = require('./vp/InternalErrors');
-
-const Constants = require('./constants');
-
-const Events = require('./vp/Events');
-
-const Utilities = require('./vp/Utilities');
-
-const Tasks = require('./vp/Tasks');
-
-const Context = require('./vp/Context');
-
-const Routes = require('./vp/Routes');
-
-const handlers = require('./vp/Handler');
-
-module.exports = _objectSpread({
-  CredentialRequestManager,
-  CredentialRequest,
-  Constants,
-  ValidationProcess,
-  ValidationErrors,
-  InternalErrors,
-  Events,
-  Utilities,
-  Tasks,
-  Context,
-  Routes
-}, handlers);
+module.exports = _objectSpread(_objectSpread({}, ValidationConstants), {}, {
+  AuthConstants
+});
