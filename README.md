@@ -1,3 +1,5 @@
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/identity-com/idv-commons)
+
 # [WIP] Identity.com Credential Request and Interactive Validation Library 
 
 - Credential Request Library (CR)
