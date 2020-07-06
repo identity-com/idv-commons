@@ -20,6 +20,7 @@
     "lint": "eslint ./src ./test --max-warnings=0",
     "lint:autofix": "eslint --fix ./src ./test --max-warnings=0",
     "test": "cross-env NODE_ENV=false nyc mocha --recursive test/unit",
+    "coverage": "cross-env FORCE_COLOR=1 nyc report && cross-env nyc check-coverage",
     "build:cjs": "BABEL_ENV=cjs babel src -d build/cjs",
     "build:es": "babel src -d build/es --no-babelrc",
     "build:browser:before": "BABEL_ENV=browser babel src -d build/prebrowser",
@@ -35,7 +36,7 @@
     "pretag": "git fetch --tags",
     "tag": "git tag $npm_package_version && git push origin --tags",
     "precommit": "npm run lint",
-    "check": "npm run lint && npm run test"
+    "check": "npm run lint && npm run test && npm run coverage"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
@@ -69,9 +70,9 @@
   },
   "nyc": {
     "lines": 99,
-    "statements": 99,
-    "functions": 98,
-    "branches": 98,
+    "statements": 98,
+    "functions": 95,
+    "branches": 95,
     "exclude": [
       "test/*"
     ]

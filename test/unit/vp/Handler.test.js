@@ -8,8 +8,10 @@ const { UCAStatus, ValidationProcessStatus, EventTypes } = require('../../../src
 const { create } = require('../../../src/vp/Events');
 const { MissingUCAError, UCAUpdateError } = require('../../../src/vp/InternalErrors');
 const {
-  Handler, TypeHandler, UCAHandler,
+  Handler, TypeHandler, UCAHandler, ExternalTaskHandler, ValidatingHandler,
 } = require('../../../src/vp/Handler');
+const { createSimpleTask } = require('../../../src/vp/Tasks');
+const InternalErrors = require('../../../src/vp/InternalErrors');
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -23,6 +25,8 @@ const ucaValue = 'abc';
 const ucaPhoneValue = '691242538';
 const ucaReceivedEvent = create(EventTypes.UCA_RECEIVED, { id: processId, ucaId, value: ucaValue });
 const ucaPhoneNumberReceivedEvent = create(EventTypes.UCA_RECEIVED, { id: processId, ucaId, value: ucaPhoneValue });
+const taskName = 'testTask';
+const externalTaskEvent = create(EventTypes.EXTERNAL_TASK_POLL, { id: new Date().getTime(), taskName });
 const simpleState = 'some state';
 const phoneNumberUCAName = 'cvc:PhoneNumber:number';
 const getStateWithUCA = () => ({
@@ -53,6 +57,12 @@ const getLimitedRetriesUCAState = () => {
   return stateWithUCA;
 };
 
+const externalTask = createSimpleTask({ name: taskName, externalSystemId: 'TestSystemId' });
+const getStateWithExternalTask = () => ({
+  status: ValidationProcessStatus.IN_PROGRESS,
+  externalTasks: [externalTask],
+});
+
 describe('Handler classes', () => {
   afterEach(() => sandbox.restore());
 
@@ -78,6 +88,11 @@ describe('Handler classes', () => {
 
       expect(updatedState).to.equal(simpleState.toUpperCase());
     });
+
+    it('should return the handler name', () => {
+      const handlerObj = new Handler();
+      expect(handlerObj.toString()).to.equal('Handler Name: Handler]');
+    });
   });
 
   context('TypeHandler', () => {
@@ -86,6 +101,11 @@ describe('Handler classes', () => {
         return state.toUpperCase();
       }
     }
+
+    it('should return the handler name', () => {
+      const handlerObj = new UpperCaseStateTypeHandler(EventTypes.PROCESS_CREATED);
+      expect(handlerObj.toString()).to.equal('TypeHandler[Process Created] Name: UpperCaseStateTypeHandler]');
+    });
 
     it('should ignore events with the wrong type', () => {
       const someOtherEventType = EventTypes.PROCESS_CREATED;
@@ -127,6 +147,11 @@ describe('Handler classes', () => {
     }
 
     const setUCAValueUpperCaseHandlerFn = new SetUCAValueUpperCaseHandler().toFunction();
+
+    it('should return the handler name', () => {
+      const handlerObj = new TestPhoneNumberComponentHandler('PhoneNumber');
+      expect(handlerObj.toString()).to.equal('UCAHandler[PhoneNumber]');
+    });
 
     it('should ignore non-UCA-received events', async () => {
       const nonUCAEvent = create(EventTypes.PROCESS_CREATED, { id: processId, credentialItemType: 'abc' });
@@ -278,6 +303,51 @@ describe('Handler classes', () => {
       const shouldBeRejected = handlerFn(stateWithPhoneNumberUCA, ucaPhoneNumberReceivedEvent);
 
       return expect(shouldBeRejected).to.be.rejectedWith(UCAUpdateError);
+    });
+  });
+
+  context('ValidatingHandler', () => {
+    it('it should set uca state to VALIDATING', async () => {
+      const testState = getStateWithUCA();
+      const handlerFn = new ValidatingHandler(ucaName).toFunction();
+      const newState = await handlerFn(testState, ucaPhoneNumberReceivedEvent);
+      expect(newState.ucas[ucaId].status).to.equal(UCAStatus.VALIDATING);
+    });
+
+    it('it should not handle the event', async () => {
+      const testState = getStateWithPhoneNumberUCA();
+      const handlerFn = new ValidatingHandler(ucaName).toFunction();
+      const newState = await handlerFn(testState, ucaPhoneNumberReceivedEvent);
+      expect(newState.ucas[ucaId].status).to.equal(UCAStatus.AWAITING_USER_INPUT);
+    });
+  });
+
+  context('ExternalTaskHandler', () => {
+    const testState = getStateWithExternalTask();
+
+    class AssertExternalTaskHandler extends ExternalTaskHandler {
+      async handleTask(state, event, task) {
+        expect(state).to.equal(testState);
+        expect(event).to.equal(externalTaskEvent);
+        expect(task).to.equal(externalTask);
+        return state;
+      }
+    }
+
+    it('should handle a external task event', () => {
+      const handlerFn = new AssertExternalTaskHandler(EventTypes.EXTERNAL_TASK_POLL, taskName).toFunction();
+      handlerFn(testState, externalTaskEvent);
+    });
+
+    it('should throw InvalidEventError', () => {
+      const handlerFn = new AssertExternalTaskHandler(EventTypes.EXTERNAL_TASK_POLL, taskName).toFunction();
+      const fubar = () => handlerFn({}, externalTaskEvent);
+      expect(fubar).to.throw(InternalErrors.InvalidEventError);
+    });
+
+    it('should return the same object', async () => {
+      const handlerFn = new ExternalTaskHandler(EventTypes.EXTERNAL_TASK_POLL, taskName).toFunction();
+      expect(await handlerFn(testState, externalTaskEvent)).to.equal(testState);
     });
   });
 });

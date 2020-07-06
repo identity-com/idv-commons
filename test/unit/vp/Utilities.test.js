@@ -1,7 +1,7 @@
 const R = require('ramda');
 const { expect } = require('chai');
 
-const { replaceUCA } = require('../../../src/vp/Utilities');
+const { replaceUCA, findUCAByName } = require('../../../src/vp/Utilities');
 const { validationProcessInitialState } = require('../../fixtures/validationProcess.json');
 
 describe('Process utils', () => {
@@ -10,6 +10,12 @@ describe('Process utils', () => {
 
     beforeEach(async () => {
       state = R.clone(validationProcessInitialState).state;
+    });
+
+    it('should find a UCA by name', () => {
+      const uca = validationProcessInitialState.state.ucas.name;
+      const ucaFound = findUCAByName(validationProcessInitialState.state, uca.name);
+      expect(ucaFound).to.equal(uca);
     });
 
     it('should replace a UCA in the state without mutating the state', () => {
