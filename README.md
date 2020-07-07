@@ -7,20 +7,154 @@
 
 This Javascript Library provides functionality around Credentials Requests (CR), Interactive Validations (IV) and Data Collect and Interactive Validation Protocol (DCVP) to help Validators to manage requests lifecycle and Credential Wallets for run validations.
 
-## Contents
 
-## Validation Process
+## how to use this library 
 
-When a credential request is created, a validation process URL is provided by the IDV-toolkit that the credential wallet can use to send UCAs for validation to. The wallet interacts with the IDV-toolkit Validation Module (VM) as follows:
+this library is already integrated in the IDV builder as a dependency and should not be used outside that context.
+see the IDV Builder docs on how to define new handler. [link ]
+  
+## Handlers
 
-1. The Credential Wallet (CW) makes a credential request to the Credential Module (CM) within the IDV-toolkit. The CM returns a CredentialRequest object that contains within it a processUrl which should be used for querying and sending information to the VM.
+Handlers are generic abstractions to process idv events.
 
-2. The CW queries the processUrl and the VM returns a validation process object. This can be used to instantiate a ValidationProcess object.
+to extend/implement a handler logic you should create a new class the extends one of the existing handler classes and override the "handler" method.
+optionally you could also override the `canHandle` method too. see more details below.
 
-3. The CW uses the 'ucas' property of the ValidationProcess to discover what information needs to be acquired from the user for validation. Each UCA can be instantiated as a ValidationUCA which will contain a ucaMapId which will be used to build the Validation Module URL for sending the UCA values to, in the form /processes/:processId/ucas/:ucaMapId.
+### TypeHandler
 
-4. For each UCA requiring user input (with a status AWAITING_USER_INPUT), the CW will get input from the user and get a value object for sending to the VM, using the method 'getValueObj' on the ValidationUCA. This method instantiates a ValidationUCAValue object which will validate that the value is good for that particular UCA type. Some UCAs are dependant upon other UCAs. This is defined by a 'dependsOn' array in the UCA object. This array contains an ordered list of UCAs which require validation before the 'parent' UCA can be validated. Values for these UCAs should be sent before a value for the parent UCA is sent.
+An ancestral handler that already implement the `canHandle` logic checking if the event type matches the handler event type.
 
-5. For each UCA, the CW sends a UCA value object to the CM, using the URL mentioned in step 3. The VM will accept the UCA by returning a HTTP 202 response along with the value object that was sent. If the VM does not accept the UCA, it will return a 500 code, along with an error object describing why it was rejected.
+_obs: Not very useful as a direct parent class_
 
-6. The CW can query the state of the Validation process at any time by querying the processUrl described in step 1. A new ValidationProcess object can be parsed from the response and the CW can check the 'status' value of the process. When the status is COMPLETE, the VM will already have contacted the Credential Module to finish the Credential creation process. The CW can now make a request to the CM to get the created credential, using the URL /credential-requests/:credentialId/credential.
+### UCAHandler
+
+An ancestral handler that already implement the `canHandle` logic checking the event type and if the event payload has an UCA(user collectible attribute) that matches the handler
+You should extend this handler to process UCA events trigger in a validation process
+
+#### Example
+
+```javascript
+class MyUCAHandler extends UCAHandler {
+   
+   constructor(ucaName = null, autoAccept = false, ucaVersion = '1') {
+        // it's a good practice to define the ucaName and ucaVersion when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(ucaName, autoAccept, ucaName);
+   }
+
+   /**
+   * handleUCA is called after all checks are made and base on the value is expected to mutate the usaState
+   * value [object] uca value received on the event
+   * ucaState [object] the specific uca state in the running process
+   **/
+   async handleUCA(value, ucaState) {
+      // most common changes are setting errors
+      // ucaState.errors = [];  
+
+      // and setting new status
+      // ucaState.status = UCAStatus.VALIDATING;
+   }
+
+  
+}
+```   
+
+### ValidatingHandler 
+
+An ancestral handler that extends UCAHandler and should be used to handle validation process
+that required async validations. An handler that extends ValidatingHandler will never autoAccept
+and if not exception is raise should change the UCA.status to VALIDATING
+
+#### Example
+
+```javascript
+class MyUCAHandler extends UCAHandler {
+   
+   constructor(ucaName = null, ucaVersion = '1') {
+        // it's a good practice to define the ucaName and ucaVersion when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(ucaName, ucaName);
+   }
+
+   /**
+   * Called after all checks are made and base on the value is expected to mutate the usaState
+   * @param value [object] uca value received on the event
+   * @param ucaState [object] the specific uca state in the running process
+   **/
+   async handleUCA(value, ucaState) {
+      // TODO dispatch the validation process asynchronous adding it to some queue implementation
+      super.handleUCA(value, ucaState) 
+   }
+
+  
+}
+```
+
+### ExternalTaskHandler
+
+An ancestral handler that already implement the `canHandle` logic checking is the event is an external task event that should be process
+You should extend this handler to process external task events like webhooks or schedule tasks.
+
+#### Example
+
+```javascript
+class MyUCAHandler extends UCAHandler {
+   
+   constructor(eventType, externalTaskName) {
+        // it's a good practice to define the eventType and externalTaskName when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(eventType, externalTaskName);
+   }
+
+  /**
+     * Manipulate the state based on the event and task. Must return the resultant state
+     * @param state The incoming state
+     * @param event The incoming event
+     * @param task The task this event is related to
+     * @return {*} The outcoming state
+     */
+   async handleTask(state, event, task) {
+      // TODO process the event and possible update the state
+      return state;
+   }
+
+  
+}
+```
+
+## Tasks
+
+Tasks are generic abstractions that can be attached to a process to handle external events like webhooks and schedule logic
+
+### Creating a PollingTask
+
+just append to the externalTasks property of the process state using the createPollingTask like:
+
+```javascript
+state.externalTasks = [
+   ...state.externalTasks,
+   createPollingTask({name: 'myTaskName', interval: '10m', externalSystemId: 'externalId', parameters: {}})
+]
+```  
+
+### Creating other tasks
+
+just append to the externalTasks property of the process state using the createSimpleTask like:
+
+```javascript
+state.externalTasks = [
+   ...state.externalTasks,
+   createSimpleTask({name: 'myTaskName', taskExpiresAfter: '24h', externalSystemId: 'externalId', parameters: {}})
+]
+```
+
+you still have to implement event source for this task you added.
+
+## Events
+
+Tasks are generic abstractions that represent "messages" to the process, most of the events are built-in
+but if you defined specific external tasks you need to fire your own events
+
+### Creating and firing events
+
+<TBD>
