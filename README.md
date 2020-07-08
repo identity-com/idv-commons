@@ -8,7 +8,7 @@
 This Javascript Library provides functionality around Credentials Requests (CR), Interactive Validations (IV) and Data Collect and Interactive Validation Protocol (DCVP) to help Validators to manage requests lifecycle and Credential Wallets for run validations.
 
 
-## how to use this library 
+## Getting Started 
 
 this library is already integrated in the IDV builder as a dependency and should not be used outside that context.
 see the [IDV builder https://github.com/identity-com/idv-builder] docs on how to define new handler. 
@@ -17,18 +17,18 @@ see the [IDV builder https://github.com/identity-com/idv-builder] docs on how to
 
 Handlers are generic abstractions to process idv events.
 
-to extend/implement a handler logic you should create a new class the extends one of the existing handler classes and override the "handler" method.
+to extend/implement a handler logic you should create a new class that extends one of the existing handler classes and override the "handler" method.
 optionally you could also override the `canHandle` method too. see more details below.
 
 ### TypeHandler
 
-An ancestral handler that already implement the `canHandle` logic checking if the event type matches the handler event type.
+An ancestral handler that already implements the `canHandle` logic checking if the event type matches the handler event type.
 
 _obs: Not very useful as a direct parent class_
 
 ### UCAHandler
 
-An ancestral handler that already implement the `canHandle` logic checking the event type and if the event payload has an UCA(user collectible attribute) that matches the handler
+An ancestral handler that already implements the `canHandle` logic checking the event type and if the event payload has an UCA(user collectible attribute) that matches the handler
 You should extend this handler to process UCA events trigger in a validation process
 
 #### Example
@@ -63,12 +63,12 @@ class MyUCAHandler extends UCAHandler {
 
 An ancestral handler that extends UCAHandler and should be used to handle validation process
 that required async validations. An handler that extends ValidatingHandler will never autoAccept
-and if not exception is raise should change the UCA.status to VALIDATING
+and will set UCA.status to VALIDATING if no exception is throw during handling process
 
 #### Example
 
 ```javascript
-class MyUCAHandler extends UCAHandler {
+class MyUCAHandler extends ValidatingHandler {
    
    constructor(ucaName = null, ucaVersion = '1') {
         // it's a good practice to define the ucaName and ucaVersion when exporting the instance
@@ -98,7 +98,7 @@ You should extend this handler to process external task events like webhooks or 
 #### Example
 
 ```javascript
-class MyUCAHandler extends UCAHandler {
+class MyUCAHandler extends ExternalTaskHandler {
    
    constructor(eventType, externalTaskName) {
         // it's a good practice to define the eventType and externalTaskName when exporting the instance
@@ -152,7 +152,7 @@ you still have to implement event source for this task you added.
 
 ## Events
 
-Tasks are generic abstractions that represent "messages" to the process, most of the events are built-in
+Events are generic abstractions that represent "messages" to the process, most of the events are built-in
 but if you defined specific external tasks you need to fire your own events
 
 The events lifecycle are manage by the IDV toolkit, they are created and dispatched as a result of external notification 
