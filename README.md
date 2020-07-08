@@ -11,7 +11,7 @@ This Javascript Library provides functionality around Credentials Requests (CR),
 ## how to use this library 
 
 this library is already integrated in the IDV builder as a dependency and should not be used outside that context.
-see the IDV Builder docs on how to define new handler. [link ]
+see the [IDV builder https://github.com/identity-com/idv-builder] docs on how to define new handler. 
   
 ## Handlers
 
@@ -155,6 +155,5 @@ you still have to implement event source for this task you added.
 Tasks are generic abstractions that represent "messages" to the process, most of the events are built-in
 but if you defined specific external tasks you need to fire your own events
 
-### Creating and firing events
-
-<TBD>
+The events lifecycle are manage by the IDV toolkit, they are created and dispatched as a result of external notification 
+that can be webhook (to setup a webhook check the [IDV builder https://github.com/identity-com/idv-builder] documentation) request or schedule request.   
