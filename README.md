@@ -1,35 +1,39 @@
-# [WIP] Identity.com Credential Request and Interactive Validation Library 
+# IDV Commons Identity.com Credential Request and Interactive Validation Library 
 
-- Credential Request Library (CR)
-- Interactive Validation Library (IV)
+The IDV Common library provides you common functionality will support you in customizing your [IDV Toolkit](https://github.com/identity-com/idv-toolkit). It is organized into two parts:
 
-## Summary
+- Credential Requests
+- Validation Plans
 
-This Javascript Library provides functionality around Credentials Requests (CR), Interactive Validations (IV) and Data Collect and Interactive Validation Protocol (DCVP) to help Validators to manage requests lifecycle and Credential Wallets for run validations.
+# Getting Started 
 
-
-## Getting Started 
-
-this library is already integrated in the IDV builder as a dependency and should not be used outside that context.
-see the [IDV builder https://github.com/identity-com/idv-builder] docs on how to define new handler. 
+This library is already integrated in the [IDV Builder](https://github.com/identity-com/idv-builder). As such, at least a rudimentary understanding of the architecture of
+an IDV Toolkit is a prerequisite. A good place to start is the [IDV Toolkit Architecture Guide](https://github.com/identity-com/idv-toolkit/blob/develop/README.md), and following that
+the details documentation of each [IDV Toolkit component](https://github.com/identity-com/idv-toolkit/tree/develop/components).
   
+# Credential Requests
+Under `src/cr` you will find the CredentialRequest class. It is a model of a user's request (and its lifecycle) to you as an IDV, to attest to a specific credential. Typically this would happen via a mobile 
+client that supports the Identity.com credential creation protocol.
+
+For more information please read the [Credential Module documentation](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/CredentialModule).
+
+# Validation Plan
+A validation plan defines the information (in the format of [User Collectable Attributes](https://github.com/identity-com/uca) that needs to be successfully validated by the IDV, before  
+the requested credential ([Verifiable Credential](https://github.com/identity-com/credential-commons)) can be created and attested to.
+The building blocks that will enable you to create custom validation plans can be found under _src/vp_ . 
+
+For more details please read the IDV Toolkit's [ValidationModule documentation](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/ValidationModule). In the following section only a rudimentary 
+overview will be given.
+
 ## Handlers
+Handlers are generic abstractions that react to events fired by the Validation Module. They have access to the state of the entire validation process, and can therefore be individually as complicated as they need to be.
 
-Handlers are generic abstractions to process idv events.
+### UCA Handler
+The IDV Commons library provides an ancestral handler, called `UCA Handler`(`src/vp/Handler.js`), that a handler that abstracts a lot of the work around receiving UCA values:
+By passing the name of a UCA as the constructor parameter, the handleUCA method will be called every time the value of that UCA changes, i.e. when the client has provided the requested information.
+This method can execute any arbitrary code, for example calling an external API to decide whether to accept or reject the UCA.
 
-to extend/implement a handler logic you should create a new class that extends one of the existing handler classes and override the "handler" method.
-optionally you could also override the `canHandle` method too. see more details below.
-
-### TypeHandler
-
-An ancestral handler that already implements the `canHandle` logic checking if the event type matches the handler event type.
-
-_obs: Not very useful as a direct parent class_
-
-### UCAHandler
-
-An ancestral handler that already implements the `canHandle` logic checking the event type and if the event payload has an UCA(user collectible attribute) that matches the handler
-You should extend this handler to process UCA events trigger in a validation process
+To extend/implement a handler logic you should create a new class that extends the `UCA Handler and override the "handler" method.
 
 #### Example
 
@@ -59,11 +63,10 @@ class MyUCAHandler extends UCAHandler {
 }
 ```   
 
-### ValidatingHandler 
+### Validating Handler 
 
-An ancestral handler that extends UCAHandler and should be used to handle validation process
-that required async validations. An handler that extends ValidatingHandler will never autoAccept
-and will set UCA.status to VALIDATING if no exception is throw during handling process
+The IDV Commons library provides an ancestral handler, called `Validating Handler` that extends UCAHandler and can be used to handle validation process that requires async validations. 
+It automatically sets the associated UCAs status to `VALIDATING` as long as no exception is thrown.
 
 #### Example
 
@@ -71,7 +74,7 @@ and will set UCA.status to VALIDATING if no exception is throw during handling p
 class MyUCAHandler extends ValidatingHandler {
    
    constructor(ucaName = null, ucaVersion = '1') {
-        // it's a good practice to define the ucaName and ucaVersion when exporting the instance
+        // it's good practice to define the ucaName and ucaVersion when exporting the instance
         // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
         super(ucaName, ucaName);
    }
@@ -90,10 +93,33 @@ class MyUCAHandler extends ValidatingHandler {
 }
 ```
 
-### ExternalTaskHandler
+# Tasks
+In many cases, UCA validation may be handled by a service external to the IDV Toolkit, and may take more than a few seconds. In this case, an external task can be added to the process state,
+that can be resolved later either via a notification or via polling.
 
-An ancestral handler that already implement the `canHandle` logic checking is the event is an external task event that should be process
-You should extend this handler to process external task events like webhooks or schedule tasks.
+For more details please read the IDV Toolkit's [ValidationModule documentation on Tasks](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/ValidationModule#long-running-tasks).
+
+### Creating a Task
+
+You can use the _createPollingTask_ helper method to append a new polling task the process state:
+
+```javascript
+state.externalTasks = [
+   ...state.externalTasks,
+   createSimpleTask(
+        { name: 'myTaskName',
+          taskExpiresAfter: '24h',
+          externalSystemId: 'externalId',
+          parameters: {
+            // details the IDV Toolkit needs to know how to poll
+          }
+        })
+]
+```
+### External Task Handler
+
+The IDV Commons library provides an ancestral handler, called `ExternalTaskHandler` that already implements the `canHandle` logic, checking if the event is an external task event
+that should be processed.
 
 #### Example
 
@@ -114,46 +140,8 @@ class MyUCAHandler extends ExternalTaskHandler {
      * @return {*} The outcoming state
      */
    async handleTask(state, event, task) {
-      // TODO process the event and possible update the state
+      // TODO process the event and possibly update the state
       return state;
    }
-
-  
 }
-```
-
-## Tasks
-
-Tasks are generic abstractions that can be attached to a process to handle external events like webhooks and schedule logic
-
-### Creating a PollingTask
-
-just append to the externalTasks property of the process state using the createPollingTask like:
-
-```javascript
-state.externalTasks = [
-   ...state.externalTasks,
-   createPollingTask({name: 'myTaskName', interval: '10m', externalSystemId: 'externalId', parameters: {}})
-]
 ```  
-
-### Creating other tasks
-
-just append to the externalTasks property of the process state using the createSimpleTask like:
-
-```javascript
-state.externalTasks = [
-   ...state.externalTasks,
-   createSimpleTask({name: 'myTaskName', taskExpiresAfter: '24h', externalSystemId: 'externalId', parameters: {}})
-]
-```
-
-you still have to implement event source for this task you added.
-
-## Events
-
-Events are generic abstractions that represent "messages" to the process, most of the events are built-in
-but if you defined specific external tasks you need to fire your own events
-
-The events lifecycle are manage by the IDV toolkit, they are created and dispatched as a result of external notification 
-that can be webhook (to setup a webhook check the [IDV builder https://github.com/identity-com/idv-builder] documentation) request or schedule request.   
