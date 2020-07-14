@@ -1,32 +1,28 @@
 # IDV Commons Identity.com Credential Request and Interactive Validation Library 
 
-The IDV Common library provides you common functionality will support you in customizing your [IDV Toolkit](https://github.com/identity-com/idv-toolkit). It is organized into two parts:
+The IDV Common library provides common functionality that will help you when customizing your [IDV Builder](https://github.com/identity-com/idv-builder) 
+or [IDV Toolkit](https://www.identity.com/ecosystem/identity-validator-toolkit/). 
 
-- Credential Requests
-- Validation Plans
+> **_NOTE:_** We are in the process of Open-Sourcing the IDV Toolkit. Until then, the IDV Builder can be used to join the 
+> Identity.com ecosystem.
 
-# Getting Started 
+IDV Commons is provides functionality regarding two main concepts of the IDV Toolkit/Builder:
+- `Validation Plans` and `Handlers`
+- `Credential Requests`
 
-This library is already integrated in the [IDV Builder](https://github.com/identity-com/idv-builder). As such, at least a rudimentary understanding of the architecture of
-an IDV Toolkit is a prerequisite. A good place to start is the [IDV Toolkit Architecture Guide](https://github.com/identity-com/idv-toolkit/blob/develop/README.md), and following that
-the details documentation of each [IDV Toolkit component](https://github.com/identity-com/idv-toolkit/tree/develop/components).
-  
-# Credential Requests
-Under `src/cr` you will find the CredentialRequest class. It is a model of a user's request (and its lifecycle) to you as an IDV, to attest to a specific credential. Typically this would happen via a mobile 
-client that supports the Identity.com credential creation protocol.
 
-For more information please read the [Credential Module documentation](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/CredentialModule).
+# Validation Plans
+A validation plan defines the information (in the format of [User Collectable Attributes](https://github.com/identity-com/uca) 
+that needs to be successfully validated by the IDV, before the requested credential ([Verifiable Credential](https://github.com/identity-com/credential-commons)) 
+can be created and attested to.
 
-# Validation Plan
-A validation plan defines the information (in the format of [User Collectable Attributes](https://github.com/identity-com/uca) that needs to be successfully validated by the IDV, before  
-the requested credential ([Verifiable Credential](https://github.com/identity-com/credential-commons)) can be created and attested to.
-The building blocks that will enable you to create custom validation plans can be found under _src/vp_ . 
-
-For more details please read the IDV Toolkit's [ValidationModule documentation](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/ValidationModule). In the following section only a rudimentary 
-overview will be given.
+The functionality provided IDV Commons for working with Validation Plans can be found in _src/vp_ , the most important one 
+being the abstraction of common Handler use-cases. 
 
 ## Handlers
-Handlers are generic abstractions that react to events fired by the Validation Module. They have access to the state of the entire validation process, and can therefore be individually as complicated as they need to be.
+Handlers are generic abstractions that react to events fired . They have access to the state of the entire validation process, 
+and can therefore be individually as complicated as they need to be. For more information around Handlers and how they fit 
+into the IDV Toolkit  architecture please refer to the [IDV Builder](https://github.com/identity-com/idv-builder) documentation.
 
 ### UCA Handler
 The IDV Commons library provides an ancestral handler, called `UCA Handler`(`src/vp/Handler.js`), that a handler that abstracts a lot of the work around receiving UCA values:
@@ -94,32 +90,42 @@ class MyUCAHandler extends ValidatingHandler {
 ```
 
 # Tasks
-In many cases, UCA validation may be handled by a service external to the IDV Toolkit, and may take more than a few seconds. In this case, an external task can be added to the process state,
-that can be resolved later either via a notification or via polling.
+In many cases, UCA validation may be handled by a service external to the IDV Toolkit, and may take more than a few seconds. 
+In this case, an external task can be added to the process state, that can be resolved later either via a notification or via polling.
 
 For more details please read the IDV Toolkit's [ValidationModule documentation on Tasks](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/ValidationModule#long-running-tasks).
 
 ### Creating a Task
 
-You can use the _createPollingTask_ helper method to append a new polling task the process state:
+Here is an example of how to add an external task in handler code, using the `createPollingTask` defined in `src/vp/Tasks.js`:
 
-```javascript
-state.externalTasks = [
-   ...state.externalTasks,
-   createSimpleTask(
-        { name: 'myTaskName',
-          taskExpiresAfter: '24h',
-          externalSystemId: 'externalId',
-          parameters: {
-            // details the IDV Toolkit needs to know how to poll
-          }
-        })
-]
 ```
+const { Tasks: {  createPollingTask  }} = require('@identity.com/idv-commons');
+
+const handler = (state, event) => {
+    // create the task
+    const task = createPollingTask({
+        taskExpiresAfter: '48h',
+        interval: '1h',
+        parameters: {
+            // details the IDV Toolkit needs to know how to poll
+        }
+    });
+
+    // trigger the external service, e.g. via an http POST
+
+    // return the updated state
+    return {
+        ...state,
+        externalTasks: [task]
+    }
+}
+```
+
 ### External Task Handler
 
-The IDV Commons library provides an ancestral handler, called `ExternalTaskHandler` that already implements the `canHandle` logic, checking if the event is an external task event
-that should be processed.
+The IDV Commons library provides an ancestral handler, called `ExternalTaskHandler` that already implements the logic to 
+check if an event is an external task event that should be processed.
 
 #### Example
 
@@ -144,4 +150,11 @@ class MyUCAHandler extends ExternalTaskHandler {
       return state;
    }
 }
-```  
+``` 
+
+# Credential Requests
+> **_NOTE:_** Credential Requests do not need to be customized when using the IDV Builder. Thus, this section will be 
+> remain a _stub_ and will updated with more details, as soon as the IDV Toolkit is open-sourced.
+
+Under `src/cr` you will find the CredentialRequest class. It is the model of a user's request (and its lifecycle) to you 
+as an IDV, to attest to a specific credential. Typically this would happen via a mobile client that supports the Identity.com credential creation protocol.
