@@ -1,26 +1,160 @@
-# [WIP] Identity.com Credential Request and Interactive Validation Library 
+# IDV Commons Identity.com Credential Request and Interactive Validation Library 
 
-- Credential Request Library (CR)
-- Interactive Validation Library (IV)
+The IDV Common library provides common functionality that will help you when customizing your [IDV Builder](https://github.com/identity-com/idv-builder) 
+or [IDV Toolkit](https://www.identity.com/ecosystem/identity-validator-toolkit/). 
 
-## Summary
+> **_NOTE:_** We are in the process of Open-Sourcing the IDV Toolkit. Until then, the IDV Builder can be used to join the 
+> Identity.com ecosystem.
 
-This Javascript Library provides functionality around Credentials Requests (CR), Interactive Validations (IV) and Data Collect and Interactive Validation Protocol (DCVP) to help Validators to manage requests lifecycle and Credential Wallets for run validations.
+IDV Commons is provides functionality regarding two main concepts of the IDV Toolkit/Builder:
+- `Validation Plans` and `Handlers`
+- `Credential Requests`
 
-## Contents
 
-## Validation Process
+# Validation Plans
+A validation plan defines the information (in the format of [User Collectable Attributes](https://github.com/identity-com/uca) 
+that needs to be successfully validated by the IDV, before the requested credential ([Verifiable Credential](https://github.com/identity-com/credential-commons)) 
+can be created and attested to.
 
-When a credential request is created, a validation process URL is provided by the IDV-toolkit that the credential wallet can use to send UCAs for validation to. The wallet interacts with the IDV-toolkit Validation Module (VM) as follows:
+The functionality provided IDV Commons for working with Validation Plans can be found in _src/vp_ , the most important one 
+being the abstraction of common Handler use-cases. 
 
-1. The Credential Wallet (CW) makes a credential request to the Credential Module (CM) within the IDV-toolkit. The CM returns a CredentialRequest object that contains within it a processUrl which should be used for querying and sending information to the VM.
+## Handlers
+Handlers are generic abstractions that react to events fired . They have access to the state of the entire validation process, 
+and can therefore be individually as complicated as they need to be. For more information around Handlers and how they fit 
+into the IDV Toolkit  architecture please refer to the [IDV Builder](https://github.com/identity-com/idv-builder) documentation.
 
-2. The CW queries the processUrl and the VM returns a validation process object. This can be used to instantiate a ValidationProcess object.
+### UCA Handler
+The IDV Commons library provides an ancestral handler, called `UCA Handler`(`src/vp/Handler.js`), that a handler that abstracts a lot of the work around receiving UCA values:
+By passing the name of a UCA as the constructor parameter, the handleUCA method will be called every time the value of that UCA changes, i.e. when the client has provided the requested information.
+This method can execute any arbitrary code, for example calling an external API to decide whether to accept or reject the UCA.
 
-3. The CW uses the 'ucas' property of the ValidationProcess to discover what information needs to be acquired from the user for validation. Each UCA can be instantiated as a ValidationUCA which will contain a ucaMapId which will be used to build the Validation Module URL for sending the UCA values to, in the form /processes/:processId/ucas/:ucaMapId.
+To extend/implement a handler logic you should create a new class that extends the `UCA Handler and override the "handler" method.
 
-4. For each UCA requiring user input (with a status AWAITING_USER_INPUT), the CW will get input from the user and get a value object for sending to the VM, using the method 'getValueObj' on the ValidationUCA. This method instantiates a ValidationUCAValue object which will validate that the value is good for that particular UCA type. Some UCAs are dependant upon other UCAs. This is defined by a 'dependsOn' array in the UCA object. This array contains an ordered list of UCAs which require validation before the 'parent' UCA can be validated. Values for these UCAs should be sent before a value for the parent UCA is sent.
+#### Example
 
-5. For each UCA, the CW sends a UCA value object to the CM, using the URL mentioned in step 3. The VM will accept the UCA by returning a HTTP 202 response along with the value object that was sent. If the VM does not accept the UCA, it will return a 500 code, along with an error object describing why it was rejected.
+```javascript
+class MyUCAHandler extends UCAHandler {
+   
+   constructor(ucaName = null, autoAccept = false, ucaVersion = '1') {
+        // it's a good practice to define the ucaName and ucaVersion when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(ucaName, autoAccept, ucaName);
+   }
 
-6. The CW can query the state of the Validation process at any time by querying the processUrl described in step 1. A new ValidationProcess object can be parsed from the response and the CW can check the 'status' value of the process. When the status is COMPLETE, the VM will already have contacted the Credential Module to finish the Credential creation process. The CW can now make a request to the CM to get the created credential, using the URL /credential-requests/:credentialId/credential.
+   /**
+   * handleUCA is called after all checks are made and base on the value is expected to mutate the usaState
+   * value [object] uca value received on the event
+   * ucaState [object] the specific uca state in the running process
+   **/
+   async handleUCA(value, ucaState) {
+      // most common changes are setting errors
+      // ucaState.errors = [];  
+
+      // and setting new status
+      // ucaState.status = UCAStatus.VALIDATING;
+   }
+
+  
+}
+```   
+
+### Validating Handler 
+
+The IDV Commons library provides an ancestral handler, called `Validating Handler` that extends UCAHandler and can be used to handle validation process that requires async validations. 
+It automatically sets the associated UCAs status to `VALIDATING` as long as no exception is thrown.
+
+#### Example
+
+```javascript
+class MyUCAHandler extends ValidatingHandler {
+   
+   constructor(ucaName = null, ucaVersion = '1') {
+        // it's good practice to define the ucaName and ucaVersion when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(ucaName, ucaName);
+   }
+
+   /**
+   * Called after all checks are made and base on the value is expected to mutate the usaState
+   * @param value [object] uca value received on the event
+   * @param ucaState [object] the specific uca state in the running process
+   **/
+   async handleUCA(value, ucaState) {
+      // TODO dispatch the validation process asynchronous adding it to some queue implementation
+      super.handleUCA(value, ucaState) 
+   }
+
+  
+}
+```
+
+# Tasks
+In many cases, UCA validation may be handled by a service external to the IDV Toolkit, and may take more than a few seconds. 
+In this case, an external task can be added to the process state, that can be resolved later either via a notification or via polling.
+
+For more details please read the IDV Toolkit's [ValidationModule documentation on Tasks](https://github.com/identity-com/idv-toolkit/tree/develop/components/modules/ValidationModule#long-running-tasks).
+
+### Creating a Task
+
+Here is an example of how to add an external task in handler code, using the `createPollingTask` defined in `src/vp/Tasks.js`:
+
+```
+const { Tasks: {  createPollingTask  }} = require('@identity.com/idv-commons');
+
+const handler = (state, event) => {
+    // create the task
+    const task = createPollingTask({
+        taskExpiresAfter: '48h',
+        interval: '1h',
+        parameters: {
+            // details the IDV Toolkit needs to know how to poll
+        }
+    });
+
+    // trigger the external service, e.g. via an http POST
+
+    // return the updated state
+    return {
+        ...state,
+        externalTasks: [task]
+    }
+}
+```
+
+### External Task Handler
+
+The IDV Commons library provides an ancestral handler, called `ExternalTaskHandler` that already implements the logic to 
+check if an event is an external task event that should be processed.
+
+#### Example
+
+```javascript
+class MyUCAHandler extends ExternalTaskHandler {
+   
+   constructor(eventType, externalTaskName) {
+        // it's a good practice to define the eventType and externalTaskName when exporting the instance
+        // but it's ok to not have any constructor params and only initialize the super class with the specific values. 
+        super(eventType, externalTaskName);
+   }
+
+  /**
+     * Manipulate the state based on the event and task. Must return the resultant state
+     * @param state The incoming state
+     * @param event The incoming event
+     * @param task The task this event is related to
+     * @return {*} The outcoming state
+     */
+   async handleTask(state, event, task) {
+      // TODO process the event and possibly update the state
+      return state;
+   }
+}
+``` 
+
+# Credential Requests
+> **_NOTE:_** Credential Requests do not need to be customized when using the IDV Builder. Thus, this section will be 
+> remain a _stub_ and will updated with more details, as soon as the IDV Toolkit is open-sourced.
+
+Under `src/cr` you will find the CredentialRequest class. It is the model of a user's request (and its lifecycle) to you 
+as an IDV, to attest to a specific credential. Typically this would happen via a mobile client that supports the Identity.com credential creation protocol.
