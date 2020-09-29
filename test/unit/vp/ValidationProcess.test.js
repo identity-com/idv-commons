@@ -5,6 +5,9 @@ const { expect } = chai;
 const {
   validationProcessInitialState,
   validationProcessOneAwaitingUserInputTwoAccepted,
+  validationProcessOneInvalidWithRetriesRemaining,
+  validationProcessOneValidating,
+  validationProcessComplete,
   validUCAObj,
   noStatusUCAObj,
   noNameUCAObj,
@@ -22,7 +25,11 @@ const {
   ValidationUCAValue,
   BadUCAValueError,
 } = require('../../../src/vp/ValidationProcess');
-const { UCAStatus } = require('../../../src/constants/ValidationConstants');
+const {
+  UCAStatus,
+  ValidationProcessStatus,
+  AggregatedValidationProcessStatus,
+} = require('../../../src/constants/ValidationConstants');
 
 describe('ValidationProcess', () => {
   it('Should parse a valid Validation Process', () => {
@@ -65,6 +72,44 @@ describe('ValidationProcess', () => {
     expect(parsedVP).to.be.an.instanceof(ValidationProcess);
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.ACCEPTED).length).to.equal(2);
     expect(parsedVP.getValidationUcasByStatus(UCAStatus.AWAITING_USER_INPUT).length).to.equal(1);
+  });
+
+  describe('Validation process UCAs summary status', () => {
+    it('should return a complete status if validation process is complete', () => {
+      const completeVP = new ValidationProcess(validationProcessComplete);
+      const aggregatedVPStatus = completeVP.getAggregatedValidationProcessStatus();
+      expect(aggregatedVPStatus).to.equal(AggregatedValidationProcessStatus.COMPLETE);
+    });
+
+    it('should return a final status if validation process is in a final state', () => {
+      const failedVP = new ValidationProcess({
+        ...validationProcessComplete,
+        state: {
+          ...validationProcessComplete.state,
+          status: ValidationProcessStatus.FAILED,
+        },
+      });
+      const aggregatedVPStatus = failedVP.getAggregatedValidationProcessStatus();
+      expect(aggregatedVPStatus).to.equal(AggregatedValidationProcessStatus.FAILED);
+    });
+
+    it('should return IN_PROGRESS_ACTION_REQUIRED if there is any UCA in AWAITING_USER_INPUT', () => {
+      const inProgressVP = new ValidationProcess(validationProcessOneAwaitingUserInputTwoAccepted);
+      const aggregatedVPStatus = inProgressVP.getAggregatedValidationProcessStatus();
+      expect(aggregatedVPStatus).to.equal(AggregatedValidationProcessStatus.IN_PROGRESS_ACTION_REQUIRED);
+    });
+
+    it('should return IN_PROGRESS_ACTION_REQUIRED if there is any UCA in INVALID with retries remaining', () => {
+      const inProgressVP = new ValidationProcess(validationProcessOneInvalidWithRetriesRemaining);
+      const aggregatedVPStatus = inProgressVP.getAggregatedValidationProcessStatus();
+      expect(aggregatedVPStatus).to.equal(AggregatedValidationProcessStatus.IN_PROGRESS_ACTION_REQUIRED);
+    });
+
+    it('should return IN_PROGRESS_VALIDATING if an in progress process has no awaiting user input or invalid UCA', () => {
+      const inProgressVP = new ValidationProcess(validationProcessOneValidating);
+      const aggregatedVPStatus = inProgressVP.getAggregatedValidationProcessStatus();
+      expect(aggregatedVPStatus).to.equal(AggregatedValidationProcessStatus.IN_PROGRESS_VALIDATING);
+    });
   });
 });
 
@@ -127,11 +172,13 @@ describe('ValidationUCA', () => {
       ];
       expect(parsedValidationUCA.dependsOnArray).to.deep.equal(expDependsOnArray);
     });
+
     it('should return an empty dependsOnArray array with no dependsOn', () => {
       const parsedValidationUCA = new ValidationUCA('phoneNumberToken', noDependsUCA, '1');
       expect(parsedValidationUCA.dependsOnArray).to.deep.equal([]);
     });
   });
+
   describe('ValidationUCAValue', () => {
     it('should be created correctly with a good value', () => {
       const goodUCA = new ValidationUCAValue('cvc:Identity:name', goodUcaValue, '1');

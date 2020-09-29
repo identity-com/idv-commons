@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -55,7 +55,7 @@
     "eslint-plugin-no-only-tests": "^2.4.0",
     "eslint-plugin-react": "^7.20.0",
     "husky": "^4.2.5",
-    "mocha": "^8.0.1",
+    "mocha": "^8.1.3",
     "nyc": "^15.1.0",
     "request-debug": "^0.2.0",
     "rimraf": "^3.0.2",
