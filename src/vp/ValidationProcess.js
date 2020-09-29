@@ -103,7 +103,6 @@ class ValidationUCA {
   }
 }
 
-
 /*
 * The ValidationProcess class is used to parse or create a response from the ValidationModule (VM)
 * it contains all the information that the credential wallet should need. The ValidationProcess
