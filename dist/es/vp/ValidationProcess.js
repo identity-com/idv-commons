@@ -11,12 +11,6 @@ const {
   BadValidationUCAError
 } = require('./ValidationErrors');
 
-const {
-  AggregatedValidationProcessStatus,
-  ValidationProcessStatus,
-  UCAStatus
-} = require('../constants/ValidationConstants');
-
 const validIdentifiers = definitions.map(d => d.identifier);
 const defaultUcaVersion = '1';
 /*
@@ -157,23 +151,6 @@ class ValidationProcess {
 
   getValidationUcasByStatus(status) {
     return this.getValidationUcas().filter(R.propEq('status', status));
-  }
-  /**
-   * Return the AggregatedValidationProcessStatus from the validation process.
-   * The aggregated validation process status is defined based on the validation
-   * process status and the UCAs status.
-   * @return {AggregatedValidationProcessStatus} the aggregated validation process status
-   */
-
-
-  getAggregatedValidationProcessStatus() {
-    if (this.status === ValidationProcessStatus.IN_PROGRESS) {
-      const awaitingUserInputUcas = this.getValidationUcasByStatus(UCAStatus.AWAITING_USER_INPUT);
-      const invalidUcasWithRetries = this.getValidationUcasByStatus(UCAStatus.INVALID).filter(uca => uca.retriesRemaining !== 0);
-      return awaitingUserInputUcas.length || invalidUcasWithRetries.length ? AggregatedValidationProcessStatus.IN_PROGRESS_ACTION_REQUIRED : AggregatedValidationProcessStatus.IN_PROGRESS_VALIDATING;
-    }
-
-    return this.status;
   }
 
 }
