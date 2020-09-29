@@ -24,14 +24,14 @@ const ValidationProcessStatus = {
 /**
  * Enum for AggregatedValidationProcessStatus.
  * This enum provides a more detailed list of status for the validation process than the ValidationProcessStatus.
- * The list of status from the ValidationProcessStatus is extended to consider the UCA status.
+ * The UCA status is also considered when deriving the aggregated validation process status.
  * @readonly
  * @enum { string } IN_PROGRESS | COMPLETE | FAILED | CANCELED | DELETED
  * @type {{IN_PROGRESS_ACTION_REQUIRED: string, IN_PROGRESS_VALIDATING: string, COMPLETE: string, FAILED: string, CANCELED: string, DELETED: string}}
  */
 const AggregatedValidationProcessStatus = {
   // The process is pending and there is at least one UCA that requires an action from the user.
-  // The UCA status is AWAITING_USER_INPUT or INVALID with retries remaining.
+  // There is an UCA in AWAITING_USER_INPUT or INVALID with retries remaining.
   IN_PROGRESS_ACTION_REQUIRED: 'IN_PROGRESS_ACTION_REQUIRED',
   // The process is pending but there is no action required from the user (a validation is in progress)
   // There is no UCA in AWAITING_USER_INPUT or INVALID with retries remaining, and at least one UCA is in

@@ -146,8 +146,8 @@ class ValidationProcess {
 
   /**
    * Return the AggregatedValidationProcessStatus from the validation process.
-   * The aggregated validation process status is defined based on the validation
-   * process status and the UCAs status.
+   * The aggregated validation process status derived from the validation
+   * process status and the UCAs state.
    * @return {AggregatedValidationProcessStatus} the aggregated validation process status
    */
   getAggregatedValidationProcessStatus() {
