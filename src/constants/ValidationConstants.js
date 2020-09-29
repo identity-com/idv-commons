@@ -1,12 +1,42 @@
 /**
  * Enum for ValidationProcessStatus
  * @readonly
- * @enum { string } IN_PROGRESS | COMPLETE | FAILED | CANCELED
+ * @enum { string } IN_PROGRESS | COMPLETE | FAILED | CANCELED | DELETED
  * @type {{IN_PROGRESS: string, COMPLETE: string, FAILED: string, CANCELED: string, DELETED: string}}
  */
 const ValidationProcessStatus = {
   // The process has been created and has not yet finished
   IN_PROGRESS: 'IN_PROGRESS',
+  // The process has been completed successfully, a credential can be issued
+  COMPLETE: 'COMPLETE',
+  // The process could not be completed, either because the user gave invalid or incomplete
+  // answers to UCA requests, or some external service indicated that the user cannot be validated
+  // A failed process typically implies that restarting the same process will also fail.
+  FAILED: 'FAILED',
+  // The user or some service has stopped the process early.
+  // A canceled process can, in principle, be restarted.
+  // It does not imply that the user's data was not valid
+  CANCELED: 'CANCELED',
+  // The process was deleted
+  DELETED: 'DELETED',
+};
+
+/**
+ * Enum for AggregatedValidationProcessStatus.
+ * This enum provides a more detailed list of status for the validation process than the ValidationProcessStatus.
+ * The list of status from the ValidationProcessStatus is extended to consider the UCA status.
+ * @readonly
+ * @enum { string } IN_PROGRESS | COMPLETE | FAILED | CANCELED | DELETED
+ * @type {{IN_PROGRESS_ACTION_REQUIRED: string, IN_PROGRESS_VALIDATING: string, COMPLETE: string, FAILED: string, CANCELED: string, DELETED: string}}
+ */
+const AggregatedValidationProcessStatus = {
+  // The process is pending and there is at least one UCA that requires an action from the user.
+  // The UCA status is AWAITING_USER_INPUT or INVALID with retries remaining.
+  IN_PROGRESS_ACTION_REQUIRED: 'IN_PROGRESS_ACTION_REQUIRED',
+  // The process is pending but there is no action required from the user (a validation is in progress)
+  // There is no UCA in AWAITING_USER_INPUT or INVALID with retries remaining, and at least one UCA is in
+  // AWAITING_DEPENDENCY or VALIDATING.
+  IN_PROGRESS_VALIDATING: 'IN_PROGRESS_VALIDATING',
   // The process has been completed successfully, a credential can be issued
   COMPLETE: 'COMPLETE',
   // The process could not be completed, either because the user gave invalid or incomplete
@@ -72,5 +102,5 @@ const ClientHints = {
 };
 
 module.exports = {
-  ValidationProcessStatus, UCAStatus, EventTypes, ClientHints,
+  ValidationProcessStatus, AggregatedValidationProcessStatus, UCAStatus, EventTypes, ClientHints,
 };
