@@ -5,6 +5,11 @@ const {
   BadValidationProcessError,
   BadValidationUCAError,
 } = require('./ValidationErrors');
+const {
+  AggregatedValidationProcessStatus,
+  ValidationProcessStatus,
+  UCAStatus,
+} = require('../constants/ValidationConstants');
 
 const validIdentifiers = definitions.map((d) => d.identifier);
 
@@ -97,6 +102,7 @@ class ValidationUCA {
     return this.dependsOnValidationUcas;
   }
 }
+
 /*
 * The ValidationProcess class is used to parse or create a response from the ValidationModule (VM)
 * it contains all the information that the credential wallet should need. The ValidationProcess
@@ -136,6 +142,24 @@ class ValidationProcess {
 
   getValidationUcasByStatus(status) {
     return this.getValidationUcas().filter(R.propEq('status', status));
+  }
+
+  /**
+   * Return the AggregatedValidationProcessStatus from the validation process.
+   * The aggregated validation process status derived from the validation
+   * process status and the UCAs state.
+   * @return {AggregatedValidationProcessStatus} the aggregated validation process status
+   */
+  getAggregatedValidationProcessStatus() {
+    if (this.status === ValidationProcessStatus.IN_PROGRESS) {
+      const awaitingUserInputUcas = this.getValidationUcasByStatus(UCAStatus.AWAITING_USER_INPUT);
+      const invalidUcasWithRetries = this.getValidationUcasByStatus(UCAStatus.INVALID)
+        .filter((uca) => (uca.retriesRemaining !== 0));
+      return (awaitingUserInputUcas.length || invalidUcasWithRetries.length)
+        ? AggregatedValidationProcessStatus.IN_PROGRESS_ACTION_REQUIRED
+        : AggregatedValidationProcessStatus.IN_PROGRESS_VALIDATING;
+    }
+    return this.status;
   }
 }
 

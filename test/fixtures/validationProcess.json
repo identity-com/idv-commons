@@ -70,6 +70,76 @@
       }
     }
   },
+  "validationProcessOneInvalidWithRetriesRemaining": {
+    "id": "003",
+    "processUrl": "/processes/003",
+    "state": {
+      "status": "IN_PROGRESS",
+      "ucaVersion": "1",
+      "credential": "credential-myCredential-v1",
+      "ucas": {
+        "name": {
+          "name": "cvc:Identity:name",
+          "status": "ACCEPTED"
+        },
+        "address": {
+          "name": "cvc:Identity:address",
+          "status": "ACCEPTED"
+        },
+        "email": {
+          "name": "cvc:Contact:email",
+          "status": "INVALID",
+          "retriesRemaining": 1
+        }
+      }
+    }
+  },
+  "validationProcessOneValidating": {
+    "id": "004",
+    "processUrl": "/processes/004",
+    "state": {
+      "status": "IN_PROGRESS",
+      "ucaVersion": "1",
+      "credential": "credential-myCredential-v1",
+      "ucas": {
+        "name": {
+          "name": "cvc:Identity:name",
+          "status": "ACCEPTED"
+        },
+        "address": {
+          "name": "cvc:Identity:address",
+          "status": "ACCEPTED"
+        },
+        "email": {
+          "name": "cvc:Contact:email",
+          "status": "VALIDATING"
+        }
+      }
+    }
+  },
+  "validationProcessComplete": {
+    "id": "005",
+    "processUrl": "/processes/005",
+    "state": {
+      "status": "COMPLETE",
+      "ucaVersion": "1",
+      "credential": "credential-myCredential-v1",
+      "ucas": {
+        "name": {
+          "name": "cvc:Identity:name",
+          "status": "ACCEPTED"
+        },
+        "address": {
+          "name": "cvc:Identity:address",
+          "status": "ACCEPTED"
+        },
+        "email": {
+          "name": "cvc:Contact:email",
+          "status": "ACCEPTED"
+        }
+      }
+    }
+  },
   "noDependsUCA": {
     "name": "cvc:Identity:name",
     "status": "AWAITING_USER_INPUT"
