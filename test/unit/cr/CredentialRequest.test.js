@@ -47,6 +47,22 @@ describe('CredentialRequest', () => {
     expect(crTest.credentialId).to.be.null;
   });
 
+  it('createCredentialRequest with scopeRequestId', () => {
+    const credentialItem = 'credential-cvc:PhoneNumber-v1';
+    const scopeRequestId = 'someSRid';
+    const crTest = crManager.createCredentialRequest(credentialItem, scopeRequestId);
+    expect(crTest).to.exist;
+
+    expect(crTest.id).to.exist;
+    expect(crTest.credentialItem).to.equal('credential-cvc:PhoneNumber-v1');
+    expect(crTest.scopeRequestId).to.equal('someSRid');
+    expect(crTest.idv).to.equal(options.serverConfig.idvDid);
+    expect(crTest.status).to.equal(CredentialRequestStatus.PENDING);
+    expect(crTest.type).to.equal(options.serverConfig.credentialRequestType);
+    expect(crTest.acceptedClaims).to.be.null;
+    expect(crTest.credentialId).to.be.null;
+  });
+
   it('CR.fromJSON', () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
