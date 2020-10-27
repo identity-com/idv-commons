@@ -25,6 +25,7 @@ class CredentialRequest {
   constructor(credentialItem, config, jsonObj) {
     this.id = jsonObj && jsonObj.id || uuid();
     this.credentialItem = jsonObj && jsonObj.credentialItem || credentialItem;
+    this.scopeRequestId = jsonObj && jsonObj.scopeRequestId || config && config.scopeRequestId;
     this.idv = jsonObj && jsonObj.idv || config && config.idvDid;
     this.status = jsonObj && jsonObj.status || CredentialRequestStatus.PENDING;
     this.type = jsonObj && jsonObj.type || config && config.credentialRequestType;

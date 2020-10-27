@@ -17,8 +17,11 @@ class CredentialRequestManager {
     }
   }
 
-  createCredentialRequest(credentialItem) {
-    return new CredentialRequest(credentialItem, this.options.serverConfig);
+  createCredentialRequest(credentialItem, scopeRequestId) {
+    return new CredentialRequest(credentialItem, {
+      scopeRequestId,
+      ...this.options.serverConfig
+    });
   }
 
 }
