@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -36,13 +36,15 @@
     "pretag": "git fetch --tags",
     "tag": "git tag $npm_package_version && git push origin --tags",
     "precommit": "npm run lint",
-    "check": "npm run lint && npm run test && npm run coverage"
+    "check": "npm run lint && npm run test && npm run coverage",
+    "audit-ci": "audit-ci --config audit-ci.json"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
     "@babel/core": "^7.10.3",
     "@babel/plugin-transform-modules-commonjs": "^7.10.1",
     "@babel/preset-env": "^7.10.3",
+    "audit-ci": "^3.1.1",
     "babel-minify": "^0.4.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -62,7 +64,7 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.0.33",
+    "@identity.com/credential-commons": "1.1.1",
     "@identity.com/uca": "1.0.16",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
