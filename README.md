@@ -1,3 +1,16 @@
+- [IDV Commons Identity.com Credential Request and Interactive Validation Library](#idv-commons-identitycom-credential-request-and-interactive-validation-library)
+- [Validation Plans](#validation-plans)
+  - [Handlers](#handlers)
+    - [UCA Handler](#uca-handler)
+      - [Example](#example)
+    - [Validating Handler](#validating-handler)
+      - [Example](#example-1)
+- [Tasks](#tasks)
+    - [Creating a Task](#creating-a-task)
+    - [External Task Handler](#external-task-handler)
+      - [Example](#example-2)
+- [Credential Requests](#credential-requests)
+
 # IDV Commons Identity.com Credential Request and Interactive Validation Library 
 
 The IDV Common library provides common functionality that will help you when customizing your [IDV Builder](https://github.com/identity-com/idv-builder) 
