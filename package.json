@@ -64,11 +64,11 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "1.1.5",
-    "@identity.com/uca": "1.0.22",
+    "@identity.com/credential-commons": "1.1.6",
+    "@identity.com/uca": "1.0.23",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
-    "uuid": "^8.3.2"
+    "uuid": "^3.3.2"
   },
   "nyc": {
     "lines": 99,
