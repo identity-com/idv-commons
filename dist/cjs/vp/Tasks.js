@@ -9,9 +9,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 /* eslint-disable class-methods-use-this */
 const timestamp = require('unix-timestamp');
 
-const {
-  v4: uuidV4
-} = require('uuid');
+const uuidV4 = require('uuid/v4');
 
 const R = require('ramda');
 
