@@ -68,7 +68,7 @@
     "@identity.com/uca": "1.0.25",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
-    "uuid": "^8.1.0"
+    "uuid": "^3.3.2"
   },
   "nyc": {
     "lines": 99,
