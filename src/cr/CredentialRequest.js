@@ -1,4 +1,4 @@
-const { v4: uuid } = require('uuid');
+const uuid = require('uuid/v4');
 const R = require('ramda');
 const { VC, Claim } = require('@identity.com/credential-commons');
 
