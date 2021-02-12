@@ -64,7 +64,7 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^1.1.7",
+    "@identity.com/credential-commons": "^1.1.8",
     "@identity.com/uca": "^1.0.26",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
