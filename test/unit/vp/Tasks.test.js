@@ -108,4 +108,14 @@ describe('Tasks', () => {
 
     expect(updatedTask).to.have.property('lastRun', lastRun.toISOString());
   });
+
+  it('should update the task status on resolve', () => {
+    const task = tasks.createPollingTask();
+    const state = {
+      externalTasks: [task],
+    };
+    const updatedState = tasks.resolveTask(state, task);
+
+    expect(updatedState.externalTasks[0]).to.have.property('status', TaskStatus.COMPLETED);
+  });
 });
