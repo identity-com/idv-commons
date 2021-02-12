@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const timestamp = require('unix-timestamp');
 
 const tasks = require('../../../src/vp/Tasks');
+
 const { TaskStatus } = tasks;
 
 describe('Tasks', () => {
