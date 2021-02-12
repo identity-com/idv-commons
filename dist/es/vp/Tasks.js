@@ -9,6 +9,9 @@ const DEFAULT_TASK_EXPIRY = '48h';
 const TaskType = {
   POLL: 'Poll'
 };
+const TaskStatus = {
+  COMPLETED: 'COMPLETED'
+};
 
 function createSimpleTask({
   name,
@@ -39,7 +42,6 @@ function createPollingTask(options = {}) {
 }
 
 function isExpired(task) {
-  if (task.expired) return true;
   const expiresAtDate = new Date(task.expiresAt);
   return expiresAtDate < new Date();
 }
@@ -50,7 +52,7 @@ function nextRunTime(task) {
 }
 
 function shouldRun(task) {
-  return task.type === TaskType.POLL && !(task.status && task.status === 'COMPLETED') && nextRunTime(task) < new Date() && !isExpired(task);
+  return task.type === TaskType.POLL && !(task.status && task.status === TaskStatus.COMPLETED) && nextRunTime(task) < new Date() && !isExpired(task);
 }
 
 function updateTask(task, runTime = new Date()) {
@@ -94,5 +96,6 @@ module.exports = {
   updateStateTasks,
   resolveTask,
   DEFAULT_TASK_EXPIRY,
-  TaskType
+  TaskType,
+  TaskStatus
 };
