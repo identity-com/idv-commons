@@ -12,5 +12,3 @@ Whenever you whitelist a specific advisory it is required to refer it to here an
 | #    | Level | Module | Title | Explanation |
 |------|-------|---------|------|-------------|
 | 1500 | Low | babel-minify>yargs-parser | Prototype Pollution | dev dependency only |
-| 1490 | Low | babel-cli > chokidar > ...<multiple> > kind-of | Validation Bypass | dev dependency only |
-| 1589 | Low | babel/cli>chokidar>fsevents>node-pre-gyp>rc>ini | Prototype Pollution | dev dependency only |
