@@ -3,6 +3,8 @@ const timestamp = require('unix-timestamp');
 
 const tasks = require('../../../src/vp/Tasks');
 
+const { TaskStatus } = tasks;
+
 describe('Tasks', () => {
   it('should create a simple task', () => {
     const task = tasks.createSimpleTask();
@@ -28,13 +30,6 @@ describe('Tasks', () => {
 
     expect(tasks.isExpired(expiredTask)).to.be.true;
     expect(tasks.isExpired(unexpiredTask)).to.be.false;
-  });
-
-  it('should report expired tasks marked as expired', () => {
-    const expiredTask = tasks.createSimpleTask();
-    expiredTask.expired = true;
-
-    expect(tasks.isExpired(expiredTask)).to.be.true;
   });
 
   it('should create a polling task', () => {
@@ -76,7 +71,7 @@ describe('Tasks', () => {
   it('should not run a completed task', () => {
     const taskDueToRun = tasks.createPollingTask({ interval: '-1m' });
     const taskNotDueToRun = tasks.createPollingTask({ interval: '-1m' });
-    taskNotDueToRun.status = 'COMPLETED';
+    taskNotDueToRun.status = TaskStatus.COMPLETED;
 
     expect(tasks.shouldRun(taskDueToRun)).to.be.true;
     expect(tasks.shouldRun(taskNotDueToRun)).to.be.false;
