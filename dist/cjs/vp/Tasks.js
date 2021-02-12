@@ -85,7 +85,7 @@ const findTaskIndex = (state, task) => R.when(R.lt(R.__, 0), R.always(null), R.i
 
 const updateStateTasks = (state, oldTask, newTask) => R.update(findTaskIndex(state, oldTask), newTask, state.externalTasks);
 
-const resolveTask = (state, task, taskStatus) => _objectSpread(_objectSpread({}, state), {}, {
+const resolveTask = (state, task, taskStatus = TaskStatus.COMPLETED) => _objectSpread(_objectSpread({}, state), {}, {
   externalTasks: updateStateTasks(state, task, _objectSpread(_objectSpread({}, task), {}, {
     status: taskStatus
   }))
