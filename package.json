@@ -64,8 +64,8 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^1.1.8",
-    "@identity.com/uca": "^1.0.26",
+    "@identity.com/credential-commons": "github:civicteam/credential-commons",
+    "@identity.com/uca": "github:civicteam/uca",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
     "uuid": "^3.3.2"
