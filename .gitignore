@@ -4,7 +4,7 @@ node_modules/
 .vscode/
 *.iml
 npm-debug.log
-build
+#build
 .DS_Store
 .nyc_output
 *.history
