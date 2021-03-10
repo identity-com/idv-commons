@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@identity.com/credential-commons": "^1.1.8",
-    "@identity.com/uca": "1.0.26",
+    "@identity.com/uca": "1.0.27",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
     "uuid": "^3.3.2"
