@@ -77,7 +77,7 @@ const findTaskIndex = (state, task) => R.when(R.lt(R.__, 0), R.always(null), R.i
 
 const updateStateTasks = (state, oldTask, newTask) => R.update(findTaskIndex(state, oldTask), newTask, state.externalTasks);
 
-const resolveTask = (state, task, taskStatus) => ({ ...state,
+const resolveTask = (state, task, taskStatus = TaskStatus.COMPLETED) => ({ ...state,
   externalTasks: updateStateTasks(state, task, { ...task,
     status: taskStatus
   })
