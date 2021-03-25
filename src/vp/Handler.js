@@ -1,4 +1,3 @@
-
 /* eslint-disable class-methods-use-this, max-classes-per-file, no-unused-vars, no-console */
 const R = require('ramda');
 const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
