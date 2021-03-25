@@ -104,7 +104,7 @@ class MyUCAHandler extends ValidatingHandler {
 
 ## Plan Manager
 The IDV Commons library provides an abstract class, called `PlanManager`(`src/vp/PlanManager.js`), that defines the interface to implement the validation plan resolution.
-This class includes methods to list the plans supported by the IDV and to retrieve a plan given a credential item type.
+This class includes methods to list the plans supported by an IDV and to retrieve a plan given a credential item type.
 
 The IDV Toolkit supports implementing a custom Plan Manager for an IDV.
 
