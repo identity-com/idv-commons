@@ -55,10 +55,10 @@ class CredentialRequest {
     this.status = CredentialRequestStatus.ACCEPTED;
   }
 
-  createCredential() {
+  createCredential(signner = null) {
     const acceptedClaims = this.acceptedClaims || [];
     const claimInstances = acceptedClaims.map((claim) => (new Claim(claim.identifier, claim.value)));
-    const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1);
+    const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1, null, signner);
     this.credentialId = credential.id;
     return credential;
   }
