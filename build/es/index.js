@@ -22,6 +22,8 @@ const Routes = require('./vp/Routes');
 
 const handlers = require('./vp/Handler');
 
+const PlanManager = require('./vp/PlanManager');
+
 module.exports = {
   CredentialRequestManager,
   CredentialRequest,
@@ -34,5 +36,6 @@ module.exports = {
   Tasks,
   Context,
   Routes,
+  PlanManager,
   ...handlers
 };

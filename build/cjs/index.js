@@ -30,6 +30,8 @@ const Routes = require('./vp/Routes');
 
 const handlers = require('./vp/Handler');
 
+const PlanManager = require('./vp/PlanManager');
+
 module.exports = _objectSpread({
   CredentialRequestManager,
   CredentialRequest,
@@ -41,5 +43,6 @@ module.exports = _objectSpread({
   Utilities,
   Tasks,
   Context,
-  Routes
+  Routes,
+  PlanManager
 }, handlers);
