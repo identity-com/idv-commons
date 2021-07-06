@@ -1,7 +1,11 @@
 const { expect } = require('chai');
 
 const CredentialRequestManager = require('../../../src/cr/CredentialRequestManager');
-const { CredentialRequest, CredentialRequestType, CredentialRequestStatus } = require('../../../src/cr/CredentialRequest');
+const {
+  CredentialRequest,
+  CredentialRequestType,
+  CredentialRequestStatus,
+} = require('../../../src/cr/CredentialRequest');
 
 const options = {
   mode: 'server', // 'client'
@@ -82,7 +86,7 @@ describe('CredentialRequest', () => {
     expect(crTest.credentialId).to.equal(crTestFromJSON.credentialId);
   });
 
-  it('acceptClaims - success', () => {
+  it('acceptClaims - success', async () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const crTest = crManager.createCredentialRequest(credentialItem);
 
@@ -99,7 +103,7 @@ describe('CredentialRequest', () => {
     ];
 
     try {
-      crTest.acceptClaims(claimsForCredential);
+      await crTest.acceptClaims(claimsForCredential);
       // console.log(JSON.stringify(crTest, null, 2));
       expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
       expect(crTest.acceptedClaims).to.exist;
@@ -175,10 +179,10 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    crTest.acceptClaims(claimsForCredential);
+    await crTest.acceptClaims(claimsForCredential);
     expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
-    const credential = crTest.createCredential();
+    const credential = await crTest.createCredential();
 
     expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
@@ -208,10 +212,10 @@ describe('CredentialRequest', () => {
       },
     ];
 
-    crTest.acceptClaims(claimsForCredential);
+    await crTest.acceptClaims(claimsForCredential);
     expect(crTest.status).to.equal(CredentialRequestStatus.ACCEPTED);
 
-    const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
+    const credentialObj = JSON.parse(JSON.stringify(await crTest.createCredential()));
     const credential = await crTest.anchorCredential(credentialObj);
 
     expect(crTest.status).to.equal(CredentialRequestStatus.ISSUED);
