@@ -16,7 +16,7 @@ const {
   goodUcaValue,
   badUcaValue,
   noDependsUCA,
-} = require('../../fixtures/validationProcess');
+} = require('../../fixtures/validationProcess.json');
 const {
   ValidationProcess,
   BadValidationProcessError,
