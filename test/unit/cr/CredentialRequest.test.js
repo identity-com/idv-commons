@@ -1,4 +1,7 @@
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+
+const { schemaLoader, CVCSchemaLoader } = require('@identity.com/credential-commons');
 
 const CredentialRequestManager = require('../../../src/cr/CredentialRequestManager');
 const {
@@ -6,6 +9,9 @@ const {
   CredentialRequestType,
   CredentialRequestStatus,
 } = require('../../../src/cr/CredentialRequest');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const options = {
   mode: 'server', // 'client'
@@ -35,6 +41,8 @@ describe('CredentialRequest', () => {
   let crManager;
   before(() => {
     crManager = new CredentialRequestManager(options);
+
+    schemaLoader.addLoader(new CVCSchemaLoader());
   });
 
   it('createCredentialRequest', () => {
@@ -250,6 +258,6 @@ describe('CredentialRequest', () => {
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
 
     const shouldFail = crTest.anchorCredential(credentialObj);
-    return expect(shouldFail).to.be.rejectedWith(Error);
+    return expect(shouldFail).to.eventually.be.rejectedWith(Error);
   });
 });
