@@ -3,3 +3,4 @@ reports
 node_modules
 build
 test
+.tmp
