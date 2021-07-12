@@ -32,7 +32,7 @@ class CredentialRequest {
   }
 
   async acceptClaims(claims = []) {
-    const claimInstances = await Promise.all(claims.map(async (claim) => {
+    const promises = claims.map(async (claim) => {
       let claimInstance;
       try {
         claimInstance = await Claim.create(claim.identifier, claim.value); // eslint-disable-line
@@ -45,7 +45,10 @@ class CredentialRequest {
         };
       }
       return claimInstance;
-    }));
+    });
+
+    const claimInstances = await Promise.all(promises);
+
     const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
     if (!R.isNil(c)) {
       throw Error(`There are invalid Claims c=${JSON.stringify(c)}`);
