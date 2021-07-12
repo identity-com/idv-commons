@@ -258,6 +258,6 @@ describe('CredentialRequest', () => {
     const credentialObj = JSON.parse(JSON.stringify(crTest.createCredential()));
 
     const shouldFail = crTest.anchorCredential(credentialObj);
-    return expect(shouldFail).to.eventually.be.rejectedWith(Error);
+    return expect(shouldFail).to.be.rejectedWith(Error);
   });
 });
