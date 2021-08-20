@@ -19,7 +19,7 @@
   "scripts": {
     "lint": "eslint ./src ./test --max-warnings=0",
     "lint:autofix": "eslint --fix ./src ./test --max-warnings=0",
-    "test": "cross-env NODE_ENV=false nyc mocha --recursive test/unit",
+    "test": "cross-env NODE_ENV=false nyc mocha --recursive test/unit --timeout=30000",
     "coverage": "cross-env FORCE_COLOR=1 nyc report && cross-env nyc check-coverage",
     "build:cjs": "BABEL_ENV=cjs babel src -d build/cjs",
     "build:es": "babel src -d build/es --no-babelrc",
@@ -64,7 +64,7 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^1.2.6",
+    "@identity.com/credential-commons": "^2.0.0-beta.3",
     "@identity.com/uca": "^1.0.29",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
