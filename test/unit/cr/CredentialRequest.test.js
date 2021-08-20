@@ -59,10 +59,10 @@ describe('CredentialRequest', () => {
     expect(crTest.credentialId).to.be.null;
   });
 
-  it('createCredentialRequest with scopeRequestId', () => {
+  it('createCredentialRequest with scopeRequestId', async () => {
     const credentialItem = 'credential-cvc:PhoneNumber-v1';
     const scopeRequestId = 'someSRid';
-    const crTest = crManager.createCredentialRequest(credentialItem, scopeRequestId);
+    const crTest = await crManager.createCredentialRequest(credentialItem, scopeRequestId);
     expect(crTest).to.exist;
 
     expect(crTest.id).to.exist;
