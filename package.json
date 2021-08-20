@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
