@@ -34,6 +34,8 @@ class CredentialRequest {
   async acceptClaims(claims = []) {
     const claimInstances = [];
     claims.reduce(async (promise, claim) => {
+      await promise;
+
       let claimInstance;
       try {
         claimInstance = await Claim.create(claim.identifier, claim.value); // eslint-disable-line
