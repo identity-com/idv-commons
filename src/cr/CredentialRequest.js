@@ -32,7 +32,8 @@ class CredentialRequest {
   }
 
   async acceptClaims(claims = []) {
-    const promises = claims.map(async (claim) => {
+    const claimInstances = [];
+    claims.reduce(async (promise, claim) => {
       let claimInstance;
       try {
         claimInstance = await Claim.create(claim.identifier, claim.value); // eslint-disable-line
@@ -44,10 +45,8 @@ class CredentialRequest {
           claim,
         };
       }
-      return claimInstance;
-    });
-
-    const claimInstances = await Promise.all(promises);
+      claimInstances.push(claimInstance);
+    }, Promise.resolve());
 
     const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
     if (!R.isNil(c)) {
