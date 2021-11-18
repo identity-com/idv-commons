@@ -17,6 +17,8 @@ const InternalErrors = require('../../../src/vp/InternalErrors');
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+schemaLoader.addLoader(new CVCSchemaLoader());
+
 const sandbox = sinon.createSandbox();
 
 const processId = '1';
@@ -68,15 +70,15 @@ describe('Handler classes', () => {
   afterEach(() => sandbox.restore());
 
   context('Handler', () => {
-    it('should behave like a pure function handler', () => {
+    it('should behave like a pure function handler', async () => {
       const handlerFn = new Handler().toFunction();
 
-      const updatedState = handlerFn(simpleState, ucaReceivedEvent);
+      const updatedState = await handlerFn(simpleState, ucaReceivedEvent);
 
       expect(updatedState).to.equal(simpleState);
     });
 
-    it('can be subclassed to provide custom functionality', () => {
+    it('can be subclassed to provide custom functionality', async () => {
       class UpperCaseStateHandler extends Handler {
         handle(state) {
           return state.toUpperCase();
@@ -85,7 +87,7 @@ describe('Handler classes', () => {
 
       const handlerFn = new UpperCaseStateHandler().toFunction();
 
-      const updatedState = handlerFn(simpleState, ucaReceivedEvent);
+      const updatedState = await handlerFn(simpleState, ucaReceivedEvent);
 
       expect(updatedState).to.equal(simpleState.toUpperCase());
     });
@@ -108,19 +110,19 @@ describe('Handler classes', () => {
       expect(handlerObj.toString()).to.equal('TypeHandler[Process Created] Name: UpperCaseStateTypeHandler]');
     });
 
-    it('should ignore events with the wrong type', () => {
+    it('should ignore events with the wrong type', async () => {
       const someOtherEventType = EventTypes.PROCESS_CREATED;
       const handlerFn = new UpperCaseStateTypeHandler(someOtherEventType).toFunction();
 
-      const updatedState = handlerFn(simpleState, ucaReceivedEvent);
+      const updatedState = await handlerFn(simpleState, ucaReceivedEvent);
 
       expect(updatedState).to.equal(simpleState);
     });
 
-    it('should handle events with the right type', () => {
+    it('should handle events with the right type', async () => {
       const handlerFn = new UpperCaseStateTypeHandler(ucaReceivedEvent.type).toFunction();
 
-      const updatedState = handlerFn(simpleState, ucaReceivedEvent);
+      const updatedState = await handlerFn(simpleState, ucaReceivedEvent);
 
       expect(updatedState).to.equal(simpleState.toUpperCase());
     });
@@ -171,15 +173,15 @@ describe('Handler classes', () => {
     it("should throw an error if the UCA referenced in the event doesn't exist", () => {
       const eventForInvalidUCA = create(EventTypes.UCA_RECEIVED, { id: processId, ucaId: 'unknown', value: ucaValue });
 
-      const shouldFail = () => setUCAValueUpperCaseHandlerFn(getStateWithUCA(), eventForInvalidUCA);
+      const shouldFail = setUCAValueUpperCaseHandlerFn(getStateWithUCA(), eventForInvalidUCA);
 
-      expect(shouldFail).to.throw(MissingUCAError);
+      expect(shouldFail).to.eventually.throw(MissingUCAError);
     });
 
     it('should throw an error if the process state has no UCAs', () => {
-      const shouldFail = () => setUCAValueUpperCaseHandlerFn(simpleState, ucaReceivedEvent);
+      const shouldFail = setUCAValueUpperCaseHandlerFn(simpleState, ucaReceivedEvent);
 
-      expect(shouldFail).to.throw(MissingUCAError);
+      expect(shouldFail).to.eventually.throw(MissingUCAError);
     });
 
     it('should mark the UCA as accepted if autoAccept is true', async () => {
@@ -294,16 +296,16 @@ describe('Handler classes', () => {
 
       const shouldBeRejected = handlerFn(getStateWithPhoneNumberUCA(), ucaPhoneNumberReceivedEvent);
 
-      return expect(shouldBeRejected).to.be.rejectedWith(UCAUpdateError);
+      return expect(shouldBeRejected).to.eventually.be.rejectedWith(UCAUpdateError);
     });
 
-    it('should not handle UCA Received events for unimplemented Civic UCA versions', () => {
+    it('should not handle UCA Received events for unimplemented Civic UCA versions', async () => {
       const handlerFn = new TestPhoneNumberComponentHandler(phoneNumberUCAName, '2').toFunction();
       const stateWithPhoneNumberUCA = getStateWithPhoneNumberUCA();
       stateWithPhoneNumberUCA.ucaVersion = '2';
       const shouldBeRejected = handlerFn(stateWithPhoneNumberUCA, ucaPhoneNumberReceivedEvent);
 
-      return expect(shouldBeRejected).to.be.rejectedWith(UCAUpdateError);
+      return expect(shouldBeRejected).to.eventually.be.rejectedWith(UCAUpdateError);
     });
   });
 
@@ -342,8 +344,8 @@ describe('Handler classes', () => {
 
     it('should throw InvalidEventError', () => {
       const handlerFn = new AssertExternalTaskHandler(EventTypes.EXTERNAL_TASK_POLL, taskName).toFunction();
-      const fubar = () => handlerFn({}, externalTaskEvent);
-      expect(fubar).to.throw(InternalErrors.InvalidEventError);
+      const fubar = handlerFn({}, externalTaskEvent);
+      expect(fubar).to.eventually.throw(InternalErrors.InvalidEventError);
     });
 
     it('should return the same object', async () => {
