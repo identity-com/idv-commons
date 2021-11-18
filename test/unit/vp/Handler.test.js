@@ -4,6 +4,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 
+const { schemaLoader, CVCSchemaLoader } = require('@identity.com/credential-commons');
 const { UCAStatus, ValidationProcessStatus, EventTypes } = require('../../../src/constants/ValidationConstants');
 const { create } = require('../../../src/vp/Events');
 const { MissingUCAError, UCAUpdateError } = require('../../../src/vp/InternalErrors');

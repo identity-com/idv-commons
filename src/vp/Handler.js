@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this, max-classes-per-file, no-unused-vars, no-console */
 const R = require('ramda');
-const { definitions, UserCollectableAttribute } = require('@identity.com/uca');
+const { schemaLoader, UserCollectableAttribute } = require('@identity.com/credential-commons');
 const {
   errors: {
     idvErrors: { IDVErrorCodes },
@@ -25,7 +25,7 @@ const {
  * toFunction() method. The event engine does this automatically when they are registered.
  */
 
-const validIdentifiers = definitions.map((d) => d.identifier);
+const { validUcaIdentifiers: validIdentifiers } = schemaLoader;
 
 /**
  * Abstract handler class - separates the two common steps in a handler function:
@@ -67,7 +67,7 @@ class Handler {
    * @return {*} A pure-function version of the handler object
    */
   toFunction() {
-    return (state, event) => {
+    return async (state, event) => {
       if (this.canHandle(event, state)) {
         return this.handle(state, event);
       }
@@ -215,7 +215,7 @@ class UCAHandler extends TypeHandler {
     checkUCAIsUpdateable(ucaState, state);
 
     // throw an error if the UCA value does not have the correct format or version
-    this.validate(value, ucaId, state.ucaVersion);
+    await this.validate(value, ucaId, state.ucaVersion);
 
     // validation has all passed
     ucaState.value = value;
@@ -236,7 +236,10 @@ class UCAHandler extends TypeHandler {
     return state;
   }
 
-  validate(value, ucaId, ucaVersion = '1') {
+  async validate(value, ucaId, ucaVersion = '1') {
+    if (this.ucaName) {
+      await schemaLoader.loadSchemaFromTitle(this.ucaName);
+    }
     // check if the ucaId is in the UCA definitions, if it is, check that the value is valid,
     // otherwise allow the value
     if (ucaVersion !== this.ucaVersion) {
@@ -249,7 +252,7 @@ class UCAHandler extends TypeHandler {
     } else if (this.ucaName && R.includes(this.ucaName, validIdentifiers)) {
       // instantiate a UCA to check the value
       try {
-        const ucaObject = new UserCollectableAttribute(this.ucaName, value, this.ucaVersion);
+        const ucaObject = await UserCollectableAttribute.create(this.ucaName, value, this.ucaVersion);
       } catch (error) {
         throw new UCAValueError(
           `UCA value '${JSON.stringify(value)}' isn't good for UCA Identifier '${ucaId}' error = ${error}`,
