@@ -1,9 +1,9 @@
 const R = require('ramda');
 
 const {
-  definitions,
+  schemaLoader,
   UserCollectableAttribute
-} = require('@identity.com/uca');
+} = require('@identity.com/credential-commons');
 
 const {
   BadUCAValueError,
@@ -17,7 +17,9 @@ const {
   UCAStatus
 } = require('../constants/ValidationConstants');
 
-const validIdentifiers = definitions.map(d => d.identifier);
+const {
+  validUcaIdentifiers: validIdentifiers
+} = schemaLoader;
 const defaultUcaVersion = '1';
 /*
 * ValidationUCAValue
@@ -35,13 +37,19 @@ class ValidationUCAValue {
     this.setValue(value);
   }
 
-  setValue(value) {
+  static async create(name, value, ucaVersion) {
+    const ucaValue = new ValidationUCAValue(name, value, ucaVersion);
+    await ucaValue.setValue(value);
+    return ucaValue;
+  }
+
+  async setValue(value) {
     // check that the input value is valid for this type of UCA
     if (this.name && validIdentifiers.includes(this.name)) {
       // instantiate a UCA to check the value
       try {
         // eslint-disable-next-line no-unused-vars
-        const ucaObject = new UserCollectableAttribute(this.name, value, this.ucaVersion);
+        const ucaObject = await UserCollectableAttribute.create(this.name, value, this.ucaVersion);
       } catch (error) {
         throw new BadUCAValueError(this.name, value, error);
       }
@@ -96,9 +104,9 @@ class ValidationUCA {
     return `ucas/${this.ucaMapId}`;
   }
 
-  getValueObj(value) {
+  async getValueObj(value) {
     // ValidationUCAValue will throw an error if the value isn't good for the UCA type
-    const validationUCAValueInst = new ValidationUCAValue(this.ucaName, value, this.ucaVersion);
+    const validationUCAValueInst = await ValidationUCAValue.create(this.ucaName, value, this.ucaVersion);
     return validationUCAValueInst.serialize();
   }
 

@@ -45,8 +45,10 @@ class CredentialRequest {
     var _this = this;
 
     return _asyncToGenerator(function* () {
-      const promises = claims.map( /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator(function* (claim) {
+      const claimInstances = [];
+      yield claims.reduce( /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator(function* (promise, claim) {
+          yield promise;
           let claimInstance;
 
           try {
@@ -61,14 +63,13 @@ class CredentialRequest {
             };
           }
 
-          return claimInstance;
+          claimInstances.push(claimInstance);
         });
 
-        return function (_x) {
+        return function (_x, _x2) {
           return _ref.apply(this, arguments);
         };
-      }());
-      const claimInstances = yield Promise.all(promises);
+      }(), Promise.resolve());
       const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
 
       if (!R.isNil(c)) {
@@ -85,15 +86,18 @@ class CredentialRequest {
 
     return _asyncToGenerator(function* () {
       const acceptedClaims = _this2.acceptedClaims || [];
-      const claimInstances = yield Promise.all(acceptedClaims.map( /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator(function* (claim) {
-          return Claim.create(claim.identifier, claim.value);
+      const claimInstances = [];
+      yield acceptedClaims.reduce( /*#__PURE__*/function () {
+        var _ref2 = _asyncToGenerator(function* (promise, claim) {
+          yield promise;
+          const claimInstance = yield Claim.create(claim.identifier, claim.value);
+          claimInstances.push(claimInstance);
         });
 
-        return function (_x2) {
+        return function (_x3, _x4) {
           return _ref2.apply(this, arguments);
         };
-      }()));
+      }(), Promise.resolve());
       const credential = yield VC.create(_this2.credentialItem, _this2.idv, null, claimInstances, 1, null, signner);
       _this2.credentialId = credential.id;
       return credential;

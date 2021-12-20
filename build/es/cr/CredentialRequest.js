@@ -36,7 +36,9 @@ class CredentialRequest {
   }
 
   async acceptClaims(claims = []) {
-    const promises = claims.map(async claim => {
+    const claimInstances = [];
+    await claims.reduce(async (promise, claim) => {
+      await promise;
       let claimInstance;
 
       try {
@@ -51,9 +53,8 @@ class CredentialRequest {
         };
       }
 
-      return claimInstance;
-    });
-    const claimInstances = await Promise.all(promises);
+      claimInstances.push(claimInstance);
+    }, Promise.resolve());
     const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
 
     if (!R.isNil(c)) {
@@ -66,7 +67,12 @@ class CredentialRequest {
 
   async createCredential(signner = null) {
     const acceptedClaims = this.acceptedClaims || [];
-    const claimInstances = await Promise.all(acceptedClaims.map(async claim => Claim.create(claim.identifier, claim.value)));
+    const claimInstances = [];
+    await acceptedClaims.reduce(async (promise, claim) => {
+      await promise;
+      const claimInstance = await Claim.create(claim.identifier, claim.value);
+      claimInstances.push(claimInstance);
+    }, Promise.resolve());
     const credential = await VC.create(this.credentialItem, this.idv, null, claimInstances, 1, null, signner);
     this.credentialId = credential.id;
     return credential;
