@@ -1,6 +1,6 @@
 {
   "name": "@identity.com/idv-commons",
-  "version": "2.0.0-beta.8",
+  "version": "2.0.0",
   "author": "Identity.com Community",
   "license": "MIT",
   "description": "Credential Request and Interactive Validation",
@@ -48,6 +48,7 @@
     "babel-minify": "^0.4.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "cross-env": "^7.0.3",
     "eslint": "7.2.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-airbnb-base": "^14.2.0",
@@ -64,8 +65,7 @@
     "sinon": "^9.0.2"
   },
   "dependencies": {
-    "@identity.com/credential-commons": "^2.0.0-beta.8",
-    "@identity.com/uca": "^1.0.29",
+    "@identity.com/credential-commons": "^2.0.2",
     "ramda": "^0.27.0",
     "unix-timestamp": "^0.2.0",
     "uuid": "^3.3.2"

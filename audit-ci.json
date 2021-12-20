@@ -2,5 +2,5 @@
   "low": true,
   "package-manager": "auto",
   "report": true,
-  "allowlist": [1500]
+  "allowlist": [1004946, 1005534]
 }

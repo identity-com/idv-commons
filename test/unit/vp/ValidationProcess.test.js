@@ -1,6 +1,9 @@
 const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+
 const R = require('ramda');
 
+chai.use(chaiAsPromised);
 const { expect } = chai;
 const {
   validationProcessInitialState,
@@ -114,7 +117,7 @@ describe('ValidationProcess', () => {
 });
 
 describe('ValidationUCA', () => {
-  it('Should parse a valid ValidationUCA', () => {
+  it('Should parse a valid ValidationUCA', async () => {
     const parsedValidationUCA = new ValidationUCA('test', validUCAObj);
     expect(parsedValidationUCA).to.be.an.instanceof(ValidationUCA);
     expect(parsedValidationUCA.ucaMapId).to.be.a('string');
@@ -125,7 +128,7 @@ describe('ValidationUCA', () => {
     expect(parsedValidationUCA.ucaVersion).to.equal('1');
   });
 
-  it('Should parse a valid ValidationUCA with a dependsOnStatus', () => {
+  it('Should parse a valid ValidationUCA with a dependsOnStatus', async () => {
     const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '2', 'VALIDATING');
     expect(parsedValidationUCA).to.be.an.instanceof(ValidationUCA);
     expect(parsedValidationUCA.ucaMapId).to.be.a('string');
@@ -152,10 +155,11 @@ describe('ValidationUCA', () => {
       expect(parsedValidationUCA.url).to.equal('ucas/test');
     });
 
-    it('should return a valid value object', () => {
+    it('should return a valid value object', async () => {
       const parsedValidationUCA = new ValidationUCA('test', validUCAObj, '1');
       const expVal = { value: nameUcaVal };
-      expect(parsedValidationUCA.getValueObj(nameUcaVal)).to.deep.equal(expVal);
+      const valueObj = await parsedValidationUCA.getValueObj(nameUcaVal);
+      expect(valueObj).to.deep.equal(expVal);
     });
 
     it('should return a valid dependsOn array', () => {
@@ -180,23 +184,23 @@ describe('ValidationUCA', () => {
   });
 
   describe('ValidationUCAValue', () => {
-    it('should be created correctly with a good value', () => {
-      const goodUCA = new ValidationUCAValue('cvc:Identity:name', goodUcaValue, '1');
+    it('should be created correctly with a good value', async () => {
+      const goodUCA = await ValidationUCAValue.create('cvc:Identity:name', goodUcaValue, '1');
       expect(goodUCA.serialize()).to.deep.equal({ value: goodUcaValue });
     });
 
     it('should throw an error with a bad value', () => {
-      const expectToFail = () => new ValidationUCAValue('cvc:Identity:name', badUcaValue, '1');
-      expect(expectToFail).to.throw(BadUCAValueError);
+      const expectToFail = ValidationUCAValue.create('cvc:Identity:name', badUcaValue, '1');
+      expect(expectToFail).to.eventually.throw(BadUCAValueError);
     });
 
     it('should throw an error with no name', () => {
-      const expectToFail = () => new ValidationUCAValue(null, badUcaValue, '1');
-      expect(expectToFail).to.throw(Error);
+      const expectToFail = ValidationUCAValue.create(null, badUcaValue, '1');
+      expect(expectToFail).to.eventually.throw(Error);
     });
 
-    it('should accept any value for a non-Civic UCA', () => {
-      const goodUCA = new ValidationUCAValue('test_uca', 'test_val', '1');
+    it('should accept any value for a non-Civic UCA', async () => {
+      const goodUCA = await ValidationUCAValue.create('test_uca', 'test_val', '1');
       expect(goodUCA.serialize()).to.deep.equal({ value: 'test_val' });
     });
   });
