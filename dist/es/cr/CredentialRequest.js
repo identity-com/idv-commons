@@ -35,12 +35,14 @@ class CredentialRequest {
     return new CredentialRequest(null, null, R.clone(obj));
   }
 
-  acceptClaims(claims = []) {
-    const claimInstances = claims.map(claim => {
+  async acceptClaims(claims = []) {
+    const claimInstances = [];
+    await claims.reduce(async (promise, claim) => {
+      await promise;
       let claimInstance;
 
       try {
-        claimInstance = new Claim(claim.identifier, claim.value); // eslint-disable-line
+        claimInstance = await Claim.create(claim.identifier, claim.value); // eslint-disable-line
 
         claimInstance.checkStatus = 'valid';
       } catch (err) {
@@ -51,8 +53,8 @@ class CredentialRequest {
         };
       }
 
-      return claimInstance;
-    });
+      claimInstances.push(claimInstance);
+    }, Promise.resolve());
     const c = R.find(R.propEq('checkStatus', 'invalid'), claimInstances);
 
     if (!R.isNil(c)) {
@@ -63,16 +65,21 @@ class CredentialRequest {
     this.status = CredentialRequestStatus.ACCEPTED;
   }
 
-  createCredential(signner = null) {
+  async createCredential(signner = null) {
     const acceptedClaims = this.acceptedClaims || [];
-    const claimInstances = acceptedClaims.map(claim => new Claim(claim.identifier, claim.value));
-    const credential = new VC(this.credentialItem, this.idv, null, claimInstances, 1, null, signner);
+    const claimInstances = [];
+    await acceptedClaims.reduce(async (promise, claim) => {
+      await promise;
+      const claimInstance = await Claim.create(claim.identifier, claim.value);
+      claimInstances.push(claimInstance);
+    }, Promise.resolve());
+    const credential = await VC.create(this.credentialItem, this.idv, null, claimInstances, 1, null, signner);
     this.credentialId = credential.id;
     return credential;
   }
 
   async anchorCredential(credentialObj, options) {
-    const credential = VC.fromJSON(credentialObj);
+    const credential = await VC.fromJSON(credentialObj);
     const anchoredCredential = await credential.requestAnchor(options);
     this.status = CredentialRequestStatus.ISSUED;
     return anchoredCredential;

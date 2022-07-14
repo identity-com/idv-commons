@@ -8,9 +8,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 const R = require('ramda');
 
 const {
-  definitions,
+  schemaLoader,
   UserCollectableAttribute
-} = require('@identity.com/uca');
+} = require('@identity.com/credential-commons');
 
 const {
   errors: {
@@ -53,7 +53,9 @@ const {
  */
 
 
-const validIdentifiers = definitions.map(d => d.identifier);
+const {
+  validUcaIdentifiers: validIdentifiers
+} = schemaLoader;
 /**
  * Abstract handler class - separates the two common steps in a handler function:
  * 1 - check if the handler applies for this event
@@ -97,13 +99,21 @@ class Handler {
 
 
   toFunction() {
-    return (state, event) => {
-      if (this.canHandle(event, state)) {
-        return this.handle(state, event);
-      }
+    var _this = this;
 
-      return state;
-    };
+    return /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator(function* (state, event) {
+        if (_this.canHandle(event, state)) {
+          return _this.handle(state, event);
+        }
+
+        return state;
+      });
+
+      return function (_x, _x2) {
+        return _ref.apply(this, arguments);
+      };
+    }();
   }
 
 }
@@ -226,7 +236,7 @@ class UCAHandler extends TypeHandler {
 
 
   handle(state, event) {
-    var _this = this;
+    var _this2 = this;
 
     return _asyncToGenerator(function* () {
       const logger = Context.contextAwareLogger(state);
@@ -238,12 +248,11 @@ class UCAHandler extends TypeHandler {
 
       checkUCAIsUpdateable(ucaState, state); // throw an error if the UCA value does not have the correct format or version
 
-      _this.validate(value, ucaId, state.ucaVersion); // validation has all passed
-
+      yield _this2.validate(value, ucaId, state.ucaVersion); // validation has all passed
 
       ucaState.value = value;
 
-      if (_this.autoAccept) {
+      if (_this2.autoAccept) {
         ucaState.status = UCAStatus.ACCEPTED;
       } // If a UCA can only be updated a fixed number of times,
       // decrement the number of retries remaining
@@ -254,24 +263,32 @@ class UCAHandler extends TypeHandler {
       }
 
       logger.debug(`Handling UCA: ${JSON.stringify(ucaState)}`);
-      yield _this.handleUCA(value, ucaState, state);
+      yield _this2.handleUCA(value, ucaState, state);
       return state;
     })();
   }
 
   validate(value, ucaId, ucaVersion = '1') {
-    // check if the ucaId is in the UCA definitions, if it is, check that the value is valid,
-    // otherwise allow the value
-    if (ucaVersion !== this.ucaVersion) {
-      throw new UCAVersionError(`Handler ucaVersion '${this.ucaVersion}' doesn't equal state ucaVersion '${ucaVersion}'`, IDVErrorCodes.ERROR_IDV_UCA_WRONG_VERSION, this.ucaVersion, ucaVersion);
-    } else if (this.ucaName && R.includes(this.ucaName, validIdentifiers)) {
-      // instantiate a UCA to check the value
-      try {
-        const ucaObject = new UserCollectableAttribute(this.ucaName, value, this.ucaVersion);
-      } catch (error) {
-        throw new UCAValueError(`UCA value '${JSON.stringify(value)}' isn't good for UCA Identifier '${ucaId}' error = ${error}`, IDVErrorCodes.ERROR_IDV_UCA_BAD_VALUE, this.ucaName, value, error);
+    var _this3 = this;
+
+    return _asyncToGenerator(function* () {
+      if (_this3.ucaName) {
+        yield schemaLoader.loadSchemaFromTitle(_this3.ucaName);
+      } // check if the ucaId is in the UCA definitions, if it is, check that the value is valid,
+      // otherwise allow the value
+
+
+      if (ucaVersion !== _this3.ucaVersion) {
+        throw new UCAVersionError(`Handler ucaVersion '${_this3.ucaVersion}' doesn't equal state ucaVersion '${ucaVersion}'`, IDVErrorCodes.ERROR_IDV_UCA_WRONG_VERSION, _this3.ucaVersion, ucaVersion);
+      } else if (_this3.ucaName && R.includes(_this3.ucaName, validIdentifiers)) {
+        // instantiate a UCA to check the value
+        try {
+          const ucaObject = yield UserCollectableAttribute.create(_this3.ucaName, value, _this3.ucaVersion);
+        } catch (error) {
+          throw new UCAValueError(`UCA value '${JSON.stringify(value)}' isn't good for UCA Identifier '${ucaId}' error = ${error}`, IDVErrorCodes.ERROR_IDV_UCA_BAD_VALUE, _this3.ucaName, value, error);
+        }
       }
-    }
+    })();
   }
   /**
    * Perform further processing on the incoming value. This is a noop by default.
@@ -353,7 +370,7 @@ class ExternalTaskHandler extends TypeHandler {
   }
 
   handle(state, event) {
-    var _this2 = this;
+    var _this4 = this;
 
     return _asyncToGenerator(function* () {
       const {
@@ -361,7 +378,7 @@ class ExternalTaskHandler extends TypeHandler {
         taskName
       } = event.payload;
       const task = taskId ? getTask(state, taskId) : getTaskByName(state, taskName);
-      return _this2.handleTask(state, event, task);
+      return _this4.handleTask(state, event, task);
     })();
   }
   /**
