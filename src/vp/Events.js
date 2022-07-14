@@ -17,13 +17,16 @@ const checkFieldsDefined = (event) => {
   return event;
 };
 
+const getContext = ({ context }) => context || {};
+
 const addEventCreator = (type, payloadFn) => {
   const eventGeneratorFn = (...args) => {
     const payload = checkFieldsDefined(payloadFn(...args));
-
+    const context = getContext(...args);
     return {
       type,
       payload,
+      context,
     };
   };
 
