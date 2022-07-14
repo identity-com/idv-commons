@@ -11,4 +11,9 @@ Whenever you whitelist a specific advisory it is required to refer it to here an
 
 | #    | Level | Module | Title | Explanation |
 |------|-------|---------|------|-------------|
-| 1500 | Low | babel-minify>yargs-parser | Prototype Pollution | dev dependency only |
+| 1067342 | Low | babel-minify>yargs-parser | Prototype Pollution | dev dependency only |
+| 1068310 | High | husky>find-versions>semver-regex | Prototype Pollution | dev dependency only |
+| 1070458 | High | mocha>wide-align>string-width>strip-ansi>ansi-regex | Regular Expression Denial of Service | dev dependency only |
+| 1081346 | moderate | eslint>table>string-width>strip-ansi>ansi-regex | Inefficient Regular Expression Complexity | dev dependency only |
+| 1081346 | moderate | mocha>nanoid | Inefficient Regular Expression Complexity | dev dependency only |
+| 1081481 | moderate | mocha>nanoid | Exposure of Sensitive Information to an Unauthorized Actor in nanoid | dev dependency only |
