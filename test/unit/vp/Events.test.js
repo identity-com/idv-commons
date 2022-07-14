@@ -22,6 +22,19 @@ describe('Events', () => {
       expect(event.payload).to.have.property('credentialItemType', credentialItemType);
     });
 
+    it('should create an event with a context', () => {
+      const context = {
+        headers: {
+          userid: 'test-user',
+        },
+      };
+      const event = create(EventTypes.PROCESS_CREATED, { id, credentialItemType, context });
+
+      expect(event).to.have.property('type', EventTypes.PROCESS_CREATED);
+      expect(event).to.have.property('payload');
+      expect(event).to.have.property('context', context);
+    });
+
     it('should throw an error if the credential item type is missing in a process created event', () => {
       const shouldFail = () => create(EventTypes.PROCESS_CREATED, {});
 
