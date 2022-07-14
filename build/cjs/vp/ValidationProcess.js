@@ -1,11 +1,15 @@
 "use strict";
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 const R = require('ramda');
 
 const {
-  definitions,
+  schemaLoader,
   UserCollectableAttribute
-} = require('@identity.com/uca');
+} = require('@identity.com/credential-commons');
 
 const {
   BadUCAValueError,
@@ -19,7 +23,9 @@ const {
   UCAStatus
 } = require('../constants/ValidationConstants');
 
-const validIdentifiers = definitions.map(d => d.identifier);
+const {
+  validUcaIdentifiers: validIdentifiers
+} = schemaLoader;
 const defaultUcaVersion = '1';
 /*
 * ValidationUCAValue
@@ -37,19 +43,31 @@ class ValidationUCAValue {
     this.setValue(value);
   }
 
-  setValue(value) {
-    // check that the input value is valid for this type of UCA
-    if (this.name && validIdentifiers.includes(this.name)) {
-      // instantiate a UCA to check the value
-      try {
-        // eslint-disable-next-line no-unused-vars
-        const ucaObject = new UserCollectableAttribute(this.name, value, this.ucaVersion);
-      } catch (error) {
-        throw new BadUCAValueError(this.name, value, error);
-      }
-    }
+  static create(name, value, ucaVersion) {
+    return _asyncToGenerator(function* () {
+      const ucaValue = new ValidationUCAValue(name, value, ucaVersion);
+      yield ucaValue.setValue(value);
+      return ucaValue;
+    })();
+  }
 
-    this.value = value;
+  setValue(value) {
+    var _this = this;
+
+    return _asyncToGenerator(function* () {
+      // check that the input value is valid for this type of UCA
+      if (_this.name && validIdentifiers.includes(_this.name)) {
+        // instantiate a UCA to check the value
+        try {
+          // eslint-disable-next-line no-unused-vars
+          const ucaObject = yield UserCollectableAttribute.create(_this.name, value, _this.ucaVersion);
+        } catch (error) {
+          throw new BadUCAValueError(_this.name, value, error);
+        }
+      }
+
+      _this.value = value;
+    })();
   } // value can be any type, including an object
 
 
@@ -99,9 +117,13 @@ class ValidationUCA {
   }
 
   getValueObj(value) {
-    // ValidationUCAValue will throw an error if the value isn't good for the UCA type
-    const validationUCAValueInst = new ValidationUCAValue(this.ucaName, value, this.ucaVersion);
-    return validationUCAValueInst.serialize();
+    var _this2 = this;
+
+    return _asyncToGenerator(function* () {
+      // ValidationUCAValue will throw an error if the value isn't good for the UCA type
+      const validationUCAValueInst = yield ValidationUCAValue.create(_this2.ucaName, value, _this2.ucaVersion);
+      return validationUCAValueInst.serialize();
+    })();
   }
 
   get dependsOnArray() {
